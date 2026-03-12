@@ -12,10 +12,7 @@ window.bloxFruitsProducts = [
     game: "Blox Fruits",
     image: "./products/spin.png"
   },
-    P_ID: 45,
-    P_name: "Buddha",
-    game: "Blox Fruits",
-    image: "./products/buddha.png"
+    
   
   {
     P_ID: 3,
@@ -263,12 +260,18 @@ window.bloxFruitsProducts = [
     game: "Blox Fruits",   
     image: "./products/fruitnt.png"
   },
-    
+  {
+    P_ID: 45,
+    P_name: "Buddha",
+    game: "Blox Fruits",
+    image: "./products/buddha.png"
+  },
   
 ];
 
 // Debug check (safe)
 console.log("✅ Blox Fruits products loaded:", window.bloxFruitsProducts.length);
+
 
 
 
