@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bokluy – MCGG Top Up</title>
+<link href="./topup.css" rel="stylesheet"/><link href="./seller-modal.css" rel="stylesheet"/>
+<link href="./banner-slider.css" rel="stylesheet"/>
+</head>
+<body class="game-page">
+<header class="mcgg-topbar">
+<div class="mcgg-topbar-inner">
+<a class="mcgg-brand" href="./home.html">
+<img alt="Bokluy" class="mcgg-logo" src="./images/logo.png"/>
+<span class="mcgg-brand-name">Bokluy - បុកលុយ</span>
+</a>
+<nav class="mcgg-nav">
+<a class="mcgg-pill" href="./index.html">ទីផ្សារហ្គេម</a><button class="mcgg-pill sell-btn" id="sellOpenBtn" type="button">ចង់លក់?</button>
+<a class="mcgg-pill" href="./home.html">Top Up</a>
+<a class="mcgg-pill mcgg-pill-primary" href="./auth.html">Log in</a>
+</nav>
+</div>
+</header>
+<main class="mcgg-page">
+<div class="mcgg-grid">
+<aside class="mcgg-left">
+<section class="mcgg-card">
+<div class="mcgg-card-head">
+<div class="mcgg-badge">i</div>
+<h3 class="mcgg-card-title">How to Top Up</h3>
+</div>
+<div class="mcgg-guide">
+<div class="banner-slider" data-autoplay="true" data-interval="2500">
+  <div class="banner-slides">
+    <img alt="MCGG Banner 1" class="mcgg-guide-banner banner-slide active" src="./images/mcggb1.png"/>
+    <img alt="MCGG Banner 2" class="mcgg-guide-banner banner-slide" src="./images/mcggb1.png"/>
+  </div>
+  <div class="banner-dots" aria-label="Banner navigation">
+    <button class="banner-dot active" type="button" data-slide="0" aria-label="Banner 1"></button>
+    <button class="banner-dot" type="button" data-slide="1" aria-label="Banner 2"></button>
+  </div>
+</div>
+<div class="mcgg-guide-text">
+<p>1) បញ្ចូល Player ID របស់អ្នក (និង Server ID ប្រសិនបើត្រូវការ)</p>
+<p>2) ចុច “Confirm” ដើម្បីបង្ហាញឈ្មោះអ្នកប្រើ (Username)</p>
+<p>3) ជ្រើសរើសផលិតផល ហើយបន្តទៅការទូទាត់</p>
+</div>
+</div>
+</section>
+<section class="mcgg-right">
+<section class="mcgg-card">
+<div class="mcgg-card-head">
+<div class="mcgg-step">1</div>
+<h3 class="mcgg-card-title">បញ្ចូលព័ត៌មានហ្គេមរបស់អ្នក</h3>
+</div>
+<div class="mcgg-form">
+<input class="mcgg-input" id="mlbbUserId" placeholder="Player ID" type="text"/>
+<input class="mcgg-input" id="mlbbServerId" placeholder="Server ID (if needed)" type="text"/>
+<button class="mcgg-btn mcgg-btn-primary" id="btnCheckName" type="button">Confirm</button>
+</div>
+<div class="mcgg-statusline" style="padding:0 14px 14px;">
+<div class="mcgg-status" id="nameStatus"></div>
+</div>
+<div class="mcgg-verified" id="playerNameBox" style="display:none;padding:0 14px 14px;font-weight:1000;">
+<span class="mcgg-verified-label">Player:</span>
+<strong id="playerNameValue">—</strong>
+</div>
+</section>
+<section class="mcgg-card">
+<div class="mcgg-card-head">
+<div class="mcgg-step">2</div>
+<h3 class="mcgg-card-title">ជ្រើសយកផលិតផល</h3>
+</div>
+<div id="productsScroll">Loading packages...</div>
+</section>
+<section class="mcgg-card">
+<div class="mcgg-card-head">
+<div class="mcgg-step">3</div>
+<h3 class="mcgg-card-title">ការទូទាត់</h3>
+</div>
+<div class="mcgg-paybox">
+<div class="mcgg-payrow" style="display:flex;align-items:center;gap:12px;">
+<img alt="ABA" class="mcgg-paylogo" src="./images/aba.png" style="width:46px;height:46px;border-radius:12px;border:2px solid #FACC15;background:#fff;object-fit:contain;padding:6px;"/>
+<div class="mcgg-paymeta" style="flex:1;">
+<div class="mcgg-paytitle" style="font-weight:1000;color:#111;">ABA KHQR</div>
+<div class="mcgg-paydesc" style="font-weight:800;color:rgba(17,17,17,.7);">Scan to pay with any banking app</div>
+</div>
+<span class="mcgg-paytag" style="font-weight:1000;border:2px solid #FACC15;background:rgba(250,204,21,.18);padding:8px 10px;border-radius:999px;">Recommended</span>
+</div>
+<div class="mcgg-checkline">
+<label class="mcgg-terms" style="font-weight:900;color:#111;">
+<input id="agreeTerms" type="checkbox"/>
+<span>I agree <a href="./terms.html">Terms and Conditions</a></span>
+</label>
+</div>
+<div class="mcgg-total">
+<div class="mcgg-total-left">
+<div class="mcgg-total-label" style="font-weight:1000;color:#111;">TOTAL</div>
+<div class="mcgg-total-value" id="totalPrice" style="font-weight:1000;font-size:22px;">$0.00</div>
+</div>
+<button class="mcgg-btn mcgg-btn-primary" disabled="" id="btnPay" type="button">Pay</button>
+</div>
+<div class="mcgg-statusline" style="margin-top:10px;font-weight:800;color:rgba(17,17,17,.78);">
+<div class="mcgg-status" id="payStatus"></div>
+</div>
+</div>
+</section>
+</section>
+</aside></div>
+</main>
+<!-- Universal Footer (yellow boxed like your screenshot) -->
+<footer class="site-footer">
+<div class="footer-social">
+<a aria-label="Facebook" class="social-circle" href="#" rel="noopener" target="_blank">
+<svg aria-hidden="true" viewbox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.87v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.62.77-1.62 1.56V12h2.76l-.44 2.88h-2.32v6.99A10 10 0 0 0 22 12z"></path></svg>
+</a>
+<a aria-label="Telegram" class="social-circle" href="#" rel="noopener" target="_blank">
+<svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9.7 14.7 9.4 19c.4 0 .6-.2.9-.4l2.1-2 4.4 3.2c.8.4 1.4.2 1.6-.7l2.9-13.6c.3-1.2-.4-1.7-1.3-1.3L2.7 9.7c-1.1.4-1.1 1.1-.2 1.3l4.4 1.4L17.2 6c.5-.3 1-.1.6.2L9.7 14.7z"></path></svg>
+</a>
+<a aria-label="TikTok" class="social-circle" href="#" rel="noopener" target="_blank">
+<svg aria-hidden="true" viewbox="0 0 24 24"><path d="M16.6 3c.5 2.1 2 3.7 4 4.1v3.2c-1.8.1-3.4-.5-4.7-1.6v6.7c0 3.3-2.7 6-6 6s-6-2.7-6-6 2.7-6 6-6c.3 0 .6 0 .9.1v3.4c-.3-.1-.6-.2-.9-.2-1.4 0-2.6 1.2-2.6 2.6S8.5 18 9.9 18s2.6-1.2 2.6-2.6V3h4.1z"></path></svg>
+</a>
+</div>
+<div class="footer-copy">© 2026 Bokluy. All Rights Reserved.</div>
+<div class="footer-links">
+<a href="./terms.html">Terms &amp; Conditions</a> | <a href="./refund.html">Refund Policy</a>
+</div>
+<div class="footer-pay">
+<span>We accept:</span>
+<img alt="ABA" src="./images/aba.svg"/>
+<img alt="KHQR" src="./images/khqr.svg"/>
+</div>
+</footer>
+<!-- Sell Modal -->
+<div aria-hidden="true" class="modal" id="sellModal">
+<div class="modal-backdrop" id="sellCloseBg"></div>
+<div aria-labelledby="sellTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head">
+<div>
+<div class="modal-title" id="sellTitle">ទម្រង់ស្នើលក់</div>
+<div class="modal-sub">សូមបំពេញព័ត៌មានខាងក្រោម (តម្រូវអស់ទាំងអស់)</div>
+</div>
+<button class="modal-x" id="sellCloseBtn" type="button">×</button>
+</div>
+<form class="modal-body" id="sellForm">
+<label class="f">
+<span class="l">លេខទូរស័ព្ទ Telegram</span>
+<input class="i" id="sellPhone" placeholder="+855..." required="" type="tel"/>
+</label>
+<label class="f">
+<span class="l">ហ្គេម</span>
+<input class="i" id="sellGame" placeholder="Growtopia / MLBB / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">វត្ថុ / Item</span>
+<input class="i" id="sellItem" placeholder="DL / BGL / Diamonds / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">តម្លៃ USD</span>
+<input class="i" id="sellPrice" placeholder="ex: 10" required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">សារ / Message</span>
+<textarea class="i t" id="sellMessage" placeholder="ពណ៌នាព័ត៌មានបន្ថែម..." required="" rows="4"></textarea>
+</label>
+<div class="modal-actions">
+<button class="btn-secondary" id="sellCancel" type="button">បោះបង់</button>
+<button class="btn-primary" type="submit">ផ្ញើសំណើ</button>
+</div>
+<div class="modal-note" id="sellStatus"></div>
+</form>
+</div>
+</div>
+<script src="./mcgg.js" type="module"></script><script src="./seller-modal.js" type="module"></script>
+<script src="./banner-slider.js"></script>
+</body>
+</html>

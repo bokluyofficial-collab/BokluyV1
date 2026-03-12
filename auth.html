@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Auth</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="./auth.css" rel="stylesheet"/><link href="./seller-modal.css" rel="stylesheet"/>
+</head>
+<body><button class="sell-btn" id="sellOpenBtn" type="button">ចង់លក់?</button>
+<div class="auth-wrapper">
+<div class="auth-card">
+<div class="auth-header">
+<button class="back-btn" onclick="window.location.href='index.html'">←</button>
+<h1 id="form-title">Login</h1>
+<p class="subtitle" id="form-subtitle">
+        Login to continue using your account
+      </p>
+</div>
+<button class="btn btn-primary" id="googleLoginBtn" type="button">
+  Continue with Google
+</button>
+<!-- Tabs -->
+<div class="auth-tabs">
+<button class="tab active" id="login-tab" type="button">Login</button>
+<button class="tab" id="register-tab" type="button">Register</button>
+</div>
+<!-- Form -->
+<div class="auth-form">
+<!-- REGISTER ONLY -->
+<div id="register-only" style="display:none;">
+<label>Display name</label>
+<input id="register-name" placeholder="e.g. gamer123"/>
+</div>
+<label>Email</label>
+<input id="auth-email" placeholder="example@email.com" type="email"/>
+<label>Password</label>
+<input id="auth-password" placeholder="••••••••" type="password"/>
+<!-- (Optional UI only) Fake captcha box, does nothing -->
+<div class="captcha-box">
+<input type="checkbox"/>
+<span>I’m not a robot</span>
+<img src="https://www.gstatic.com/recaptcha/api2/logo_48.png"/>
+</div>
+<button class="primary-btn" id="submit-btn" type="button">
+        Login
+      </button>
+<p class="message" id="message"></p>
+</div>
+</div>
+</div>
+<!-- Sell Modal -->
+<div aria-hidden="true" class="modal" id="sellModal">
+<div class="modal-backdrop" id="sellCloseBg"></div>
+<div aria-labelledby="sellTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head">
+<div>
+<div class="modal-title" id="sellTitle">ទម្រង់ស្នើលក់</div>
+<div class="modal-sub">សូមបំពេញព័ត៌មានខាងក្រោម (តម្រូវអស់ទាំងអស់)</div>
+</div>
+<button class="modal-x" id="sellCloseBtn" type="button">×</button>
+</div>
+<form class="modal-body" id="sellForm">
+<label class="f">
+<span class="l">លេខទូរស័ព្ទ Telegram</span>
+<input class="i" id="sellPhone" placeholder="+855..." required="" type="tel"/>
+</label>
+<label class="f">
+<span class="l">ហ្គេម</span>
+<input class="i" id="sellGame" placeholder="Growtopia / MLBB / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">វត្ថុ / Item</span>
+<input class="i" id="sellItem" placeholder="DL / BGL / Diamonds / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">តម្លៃ USD</span>
+<input class="i" id="sellPrice" placeholder="ex: 10" required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">សារ / Message</span>
+<textarea class="i t" id="sellMessage" placeholder="ពណ៌នាព័ត៌មានបន្ថែម..." required="" rows="4"></textarea>
+</label>
+<div class="modal-actions">
+<button class="btn-secondary" id="sellCancel" type="button">បោះបង់</button>
+<button class="btn-primary" type="submit">ផ្ញើសំណើ</button>
+</div>
+<div class="modal-note" id="sellStatus"></div>
+</form>
+</div>
+</div>
+<script src="./supabase/auth.js" type="module"></script><script src="./seller-modal.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bokluy – Top Up</title>
+<link href="style.css" rel="stylesheet"/><link href="./seller-modal.css" rel="stylesheet"/>
+</head>
+<body class="topup-bg">
+<div class="topup-shell">
+<div class="topup-topbar">
+<div class="topup-brand">
+<img alt="Bokluy" src="./images/logo.png"/>
+<span>Bokluy</span>
+</div>
+<div class="topup-actions">
+<a class="topup-pill" href="./index.html">ទីផ្សារហ្គេម</a><button class="topup-pill sell-btn" id="sellOpenBtn" type="button">ចង់លក់?</button>
+<!-- SELLER BUTTON (next to marketplace) -->
+
+<div class="userbox" id="userbox">
+   
+  </div>
+</div>
+<!-- USER ICON (image) -->
+<div class="userbox" id="userbox">
+<button aria-label="Account" class="userbtn" id="userbtn" type="button">
+<!-- change this icon path -->
+<img alt="Account" class="userbtn-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" src="./images/user.png"/>
+<span class="userbtn-fallback" style="display:none;">👤</span>
+</button>
+<div class="usermenu" id="usermenu">
+<a class="um-item" href="./dashboard.html" id="umDashboard" style="display:none;">Dashboard</a>
+<a class="um-item" href="./owner_orders.html" id="umOwner" style="display:none;">Owner Orders</a>
+<a class="um-item" href="./auth.html" id="umLogin">Login</a>
+<button class="um-item danger" id="umLogout" style="display:none;" type="button">Logout</button>
+</div>
+</div>
+</div>
+</div>
+<div class="topup-hero">
+<img alt="Bokluy Top Up Banner" src="./images/homebanner.png"/>
+</div>
+<div class="topup-strip">
+<div>
+<h2>Game Top Up</h2>
+<p>Select a game below to continue</p>
+</div>
+<a class="topup-pill" href="#games">Browse Games</a>
+</div>
+<div class="game-grid game-grid-v3" id="games">
+<a class="game-card-v3" href="./mlbb.html">
+<div class="game-card-v3-media">
+<img alt="Mobile Legends" src="./images/mlbblogo.png"/>
+</div>
+<div class="game-card-v3-label">MOBILE LEGEND</div>
+</a>
+<a class="game-card-v3" href="./freefire.html">
+<div class="game-card-v3-media">
+<img alt="Free Fire" src="./images/fflogo.png"/>
+</div>
+<div class="game-card-v3-label">FREE FIRE</div>
+</a>
+<a class="game-card-v3" href="./pubg.html">
+<div class="game-card-v3-media">
+<img alt="PUBG" src="./images/pubglogo.png"/>
+</div>
+<div class="game-card-v3-label">PUBG</div>
+</a>
+<a class="game-card-v3" href="./hok.html">
+<div class="game-card-v3-media">
+<img alt="Honor of Kings" src="./images/hoklogo.png"/>
+</div>
+<div class="game-card-v3-label">HONOR OF KINGS</div>
+<a class="game-card-v3" href="./mcgg.html">
+<div class="game-card-v3-media">
+<img alt="MCGG" src="./images/mcgglogo.png"/>
+</div>
+<div class="game-card-v3-label">MCGG</div>
+</a>
+<a class="game-card-v3" href="./index.html">
+<div class="game-card-v3-media">
+<img alt="Roblox" src="./images/robloxlogo.png"/>
+</div>
+<div class="game-card-v3-label">ROBLOX</div>
+</a>
+<a class="game-card-v3" href="./deltaforce.html">
+<div class="game-card-v3-media">
+<img alt="Deltaforce" src="./images/deltaforcelogo.png"/>
+</div>
+<div class="game-card-v3-label">Deltaforce</div>
+</a>
+<a class="game-card-v3" href="./growtopia.html">
+<div class="game-card-v3-media">
+<img alt="Deltaforce" src="./images/GTlogo.png"/>
+</div>
+<div class="game-card-v3-label">Growtopia</div>
+</a>
+</a></div>
+<footer class="site-footer">
+<div class="footer-social">
+<a aria-label="Facebook" class="social-circle" href="#" rel="noopener" target="_blank"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.87v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.62.77-1.62 1.56V12h2.76l-.44 2.88h-2.32v6.99A10 10 0 0 0 22 12z"></path></svg></a>
+<a aria-label="Telegram" class="social-circle" href="#" rel="noopener" target="_blank"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9.7 14.7 9.4 19c.4 0 .6-.2.9-.4l2.1-2 4.4 3.2c.8.4 1.4.2 1.6-.7l2.9-13.6c.3-1.2-.4-1.7-1.3-1.3L2.7 9.7c-1.1.4-1.1 1.1-.2 1.3l4.4 1.4L17.2 6c.5-.3 1-.1.6.2L9.7 14.7z"></path></svg></a>
+<a aria-label="TikTok" class="social-circle" href="#" rel="noopener" target="_blank"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M16.6 3c.5 2.1 2 3.7 4 4.1v3.2c-1.8.1-3.4-.5-4.7-1.6v6.7c0 3.3-2.7 6-6 6s-6-2.7-6-6 2.7-6 6-6c.3 0 .6 0 .9.1v3.4c-.3-.1-.6-.2-.9-.2-1.4 0-2.6 1.2-2.6 2.6S8.5 18 9.9 18s2.6-1.2 2.6-2.6V3h4.1z"></path></svg></a>
+</div>
+<div class="footer-copy">© 2026 Bokluy. All Rights Reserved.</div>
+<div class="footer-links">
+<a href="./terms.html">Terms &amp; Conditions</a> | <a href="./refund.html">Refund Policy</a>
+</div>
+<div class="footer-pay">
+<span>We accept:</span>
+<img alt="ABA" src="./images/aba.svg"/>
+<img alt="KHQR" src="./images/khqr.svg"/>
+</div>
+</footer>
+
+<!-- add this if you want the menu to work on this page -->
+<!-- Sell Modal -->
+<div aria-hidden="true" class="modal" id="sellModal">
+<div class="modal-backdrop" id="sellCloseBg"></div>
+<div aria-labelledby="sellTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head">
+<div>
+<div class="modal-title" id="sellTitle">ទម្រង់ស្នើលក់</div>
+<div class="modal-sub">សូមបំពេញព័ត៌មានខាងក្រោម (តម្រូវអស់ទាំងអស់)</div>
+</div>
+<button class="modal-x" id="sellCloseBtn" type="button">×</button>
+</div>
+<form class="modal-body" id="sellForm">
+<label class="f">
+<span class="l">លេខទូរស័ព្ទ Telegram</span>
+<input class="i" id="sellPhone" placeholder="+855..." required="" type="tel"/>
+</label>
+<label class="f">
+<span class="l">ហ្គេម</span>
+<input class="i" id="sellGame" placeholder="Growtopia / MLBB / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">វត្ថុ / Item</span>
+<input class="i" id="sellItem" placeholder="DL / BGL / Diamonds / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">តម្លៃ USD</span>
+<input class="i" id="sellPrice" placeholder="ex: 10" required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">សារ / Message</span>
+<textarea class="i t" id="sellMessage" placeholder="ពណ៌នាព័ត៌មានបន្ថែម..." required="" rows="4"></textarea>
+</label>
+<div class="modal-actions">
+<button class="btn-secondary" id="sellCancel" type="button">បោះបង់</button>
+<button class="btn-primary" type="submit">ផ្ញើសំណើ</button>
+</div>
+<div class="modal-note" id="sellStatus"></div>
+</form>
+</div>
+</div>
+<script src="./topup-user-menu.js" type="module"></script><script src="./seller-modal.js" type="module"></script>
+</body>
+</html>

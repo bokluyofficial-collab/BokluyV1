@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bokluy – Dashboard</title>
+  <link rel="stylesheet" href="./dashboard.css" />
+</head>
+
+<body>
+  <div class="dash-shell">
+    <!-- Header -->
+    <header class="dash-header">
+      <a class="brand" href="./index.html" aria-label="Back to home">
+        <img class="brand-logo" src="./images/logo.png" alt="Bokluy"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+        <span class="brand-text" style="display:none;">Bokluy</span>
+      </a>
+
+      <!-- Single combined user button -->
+      <div class="userbox">
+        <button class="userbtn" id="userMenuBtn" type="button" aria-label="Account menu">
+          <span class="avatar">
+            <img src="./images/user-icon.png" alt="User"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+            <span class="avatar-fallback" style="display:none;">👤</span>
+          </span>
+
+          <span class="userbtn-text">
+            <span class="userbtn-name" id="dashUserName">User</span>
+            <span class="userbtn-sub" id="dashUserSub">Logged in</span>
+          </span>
+
+          <span class="chev">▾</span>
+        </button>
+
+        <div class="usermenu" id="userMenu">
+          <a class="um-item" href="./dashboard.html">Dashboard</a>
+          <a class="um-item" href="./topup.html">Top Up</a>
+          <a class="um-item" href="./index.html">ទីផ្សារហ្គេម</a>
+          <button class="um-item danger" id="btnLogout" type="button">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero strip -->
+    <section class="hero">
+      <div class="hero-left">
+        <div class="hero-title">Your Dashboard</div>
+        <div class="hero-sub">
+          Track your orders, points, and spins. Points are added after the owner marks your order as completed.
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <a class="btn btn-primary" href="./topup.html">Top Up</a>
+        <a class="btn btn-ghost" href="./index.html">ទីផ្សារហ្គេម</a>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="stat-card glow">
+        <div class="stat-top">
+          <span class="stat-label">Points</span>
+          <span class="pill pill-yellow">100 pts = $1</span>
+        </div>
+        <div class="stat-value">
+          <span id="pointsValue">0</span>
+          <span class="stat-unit">pts</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar"><div class="progress-fill" id="pointsFill" style="width:0%"></div></div>
+          <div class="progress-text"><span id="pointsHint">0 / 30</span></div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Pending points</span>
+          <span class="pill pill-gray">Awaiting completion</span>
+        </div>
+        <div class="stat-value">
+          <span id="pendingPointsValue">0</span>
+          <span class="stat-unit">pts</span>
+        </div>
+        <div class="stat-foot" id="pendingHint">From orders not completed yet</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <span class="stat-label">Exchange value</span>
+          <span class="pill pill-gray">100 pts = $1</span>
+        </div>
+        <div class="stat-value">
+          <span id="exchangeValue">$0.00</span>
+        </div>
+        <div class="stat-foot">
+          <div class="stat-hint" id="exchangeHint">0 pts until $1</div>
+        </div>
+      </div>
+
+</section>
+
+    <!-- Main grid -->
+    <section class="grid">
+      <!-- Orders -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Your Orders</div>
+            <div class="panel-sub">Latest activity (pending → completed)</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-ghost btn-small" id="btnRefreshOrders" type="button">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="t-row t-head">
+            <div>Game</div>
+            <div>Package</div>
+            <div>Total</div>
+            <div>Status</div>
+            <div>Date</div>
+          </div>
+
+          <div id="ordersList" class="t-body"></div>
+
+          <div id="ordersEmpty" class="empty" style="display:none;">
+            <div class="empty-title">No orders yet</div>
+            <div class="empty-sub">After you top up, orders will appear here.</div>
+            <a class="btn btn-primary" href="./topup.html">Top up now</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wheel selection -->
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Exchange points</div>
+            <div class="panel-sub">Rule: 1 completed order = 1 point • 100 points = $1</div>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="note">
+            Exchange is handled manually by the owner/admin. When you reach 100 points, contact support and share your account email + dashboard screenshot.
+          </div>
+        </div>
+      </div>
+<!-- ===== Prizes Modal ===== -->
+<div class="modal" id="prizeModal" aria-hidden="true">
+  <div class="modal-backdrop" id="prizeModalBackdrop"></div>
+
+  <div class="modal-card" role="dialog" aria-modal="true" aria-label="Prizes">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">Prize Pool</div>
+        <div class="modal-sub">Select a game to preview Common / Epic / Jackpot rewards</div>
+      </div>
+      <button class="icon-btn" id="prizeModalClose" type="button" aria-label="Close">✕</button>
+    </div>
+
+    <div class="modal-tabs" id="prizeGameTabs">
+      <button class="tab active" type="button" data-game="mlbb">
+        <span class="tab-ico"><img src="./images/games/mlbb.png" alt="" onerror="this.src='./images/placeholder.png'"></span>
+        MLBB
+      </button>
+
+      <button class="tab" type="button" data-game="freefire">
+        <span class="tab-ico"><img src="./images/games/freefire.png" alt="" onerror="this.src='./images/placeholder.png'"></span>
+        Free Fire
+      </button>
+
+      <button class="tab" type="button" data-game="hok">
+        <span class="tab-ico"><img src="./images/games/hok.png" alt="" onerror="this.src='./images/placeholder.png'"></span>
+        HOK
+      </button>
+
+      <button class="tab" type="button" data-game="pubg">
+        <span class="tab-ico"><img src="./images/games/pubg.png" alt="" onerror="this.src='./images/placeholder.png'"></span>
+        PUBG
+      </button>
+    </div>
+
+    <div class="modal-body" id="prizeModalBody">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</div>
+
+  <!-- UI interactions for this new layout -->
+  <script type="module" src="./dashboard-ui.js"></script>
+
+  <!-- Your existing data logic (keep it) -->
+  <script type="module" src="./dashboard.js"></script>
+</body>
+</html>

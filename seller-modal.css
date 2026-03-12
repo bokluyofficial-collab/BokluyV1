@@ -1,0 +1,253 @@
+/* ===== Want to sell button ===== */
+    .sell-btn{
+      width: 100%;
+      height: 44px;
+      margin-top: 10px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border-radius: 14px;
+      font-weight: 1000;
+      cursor: pointer;
+    }
+    .sell-btn:hover{ border-color: rgba(250,204,21,.30); }
+
+    /* ===== Modal ===== */
+    .modal{ display:none; position: fixed; inset:0; z-index: 200; }
+    .modal[aria-hidden="false"]{ display:block; }
+
+    .modal-backdrop{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-card{
+      position: relative;
+      max-width: 520px;
+      margin: 8vh auto;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 18px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+
+    .modal-head{
+      padding: 14px 14px 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+
+    .modal-title{ font-weight: 1000; color: rgba(234,240,255,.95); }
+    .modal-sub{ font-size: 12px; color: var(--muted); font-weight: 800; margin-top: 2px; }
+
+    .modal-x{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.20);
+      color: var(--text);
+      font-size: 20px;
+      cursor:pointer;
+    }
+
+    .modal-body{ padding: 14px; display:grid; gap: 12px; }
+
+    .f{ display:grid; gap: 6px; }
+    .l{ font-size: 12px; color: var(--muted); font-weight: 900; letter-spacing:.04em; }
+
+    .i{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline: none;
+      font-weight: 800;
+    }
+    .i:focus{
+      border-color: rgba(250,204,21,.45);
+      box-shadow: 0 0 0 4px rgba(250,204,21,.12);
+    }
+    .i.t{ resize: vertical; }
+
+    .modal-actions{
+      display:flex;
+      gap: 10px;
+      justify-content:flex-end;
+      margin-top: 4px;
+    }
+
+    .btn-primary{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 0;
+      cursor:pointer;
+      font-weight: 1000;
+      color:#111;
+      background: linear-gradient(180deg, var(--y), var(--y2));
+    }
+    .btn-secondary{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      font-weight: 1000;
+    }
+    .modal-note{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      min-height: 16px;
+    }
+  
+/* ===== Nav placement override (keep same look, fit next to marketplace pill) ===== */
+.hok-nav .sell-btn,
+nav .sell-btn{
+  width: auto;
+  height: 40px;
+  margin-top: 0;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+.hok-nav{
+  gap: 10px;
+}
+@media (max-width: 720px){
+  .hok-nav .sell-btn,
+  nav .sell-btn{
+    width: 100%;
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}
+/* --- SELLER MODAL: white card, translucent border, yellow bold text --- */
+#sellModal .modal-card,
+.sell-modal .modal-card{
+  background: rgba(255,255,255,.96);       /* white */
+  border: 1px solid rgba(250,204,21,.35);  /* translucent yellow border */
+  color: #a16207;                           /* amber text base */
+}
+
+/* Title + labels = yellow + bold */
+#sellModal .modal-title,
+#sellModal label,
+.sell-modal .modal-title,
+.sell-modal label{
+  color: #f59e0b;    /* yellow/amber */
+  font-weight: 900;
+}
+
+/* Inputs readable on white */
+#sellModal input,
+#sellModal select,
+#sellModal textarea,
+.sell-modal input,
+.sell-modal select,
+.sell-modal textarea{
+  background: rgba(255,255,255,.95);
+  color: #111827;
+  border: 1px solid rgba(0,0,0,.12);
+}
+
+#sellModal input:focus,
+#sellModal select:focus,
+#sellModal textarea:focus,
+.sell-modal input:focus,
+.sell-modal select:focus,
+.sell-modal textarea:focus{
+  border-color: rgba(245,158,11,.7);
+  box-shadow: 0 0 0 4px rgba(250,204,21,.25);
+}
+
+/* Buttons in modal */
+#sellModal .btn-primary,
+.sell-modal .btn-primary{
+  background: #facc15;
+  color: #ffffff;
+  font-weight: 900;
+}
+
+#sellModal .btn-secondary,
+.sell-modal .btn-secondary{
+  background: rgba(0,0,0,.06);
+  color: #111827;
+  font-weight: 800;
+}
+/* ===== NAV: mobile-safe wrapping ===== */
+.navbar,
+nav,
+.nav,
+.nav-links,
+.nav-actions,
+.header-actions,
+.navbar-right {
+  flex-wrap: wrap;
+}
+
+/* If your nav container isn't flex already, this won't hurt. If it is, it will allow wrapping. */
+.navbar,
+nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Keep buttons from shrinking to weird sizes */
+#sellOpenBtn,
+.sell-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* Mobile: make nav items full-width rows if needed */
+@media (max-width: 520px) {
+  .nav-links,
+  .nav-actions,
+  .navbar-right,
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  /* Make buttons easier to tap */
+  #sellOpenBtn,
+  .sell-btn {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+/* Keep seller button from stretching */
+#sellOpenBtn,
+.sell-btn {
+  width: fit-content;     /* don’t fill the row */
+  max-width: 100%;
+  flex: 0 0 auto;         /* don’t grow */
+}
+
+/* If it’s inside a flex row that uses space-between or 100% width */
+.nav-actions #sellOpenBtn,
+.nav-actions .sell-btn,
+.topup-actions #sellOpenBtn,
+.topup-actions .sell-btn {
+  flex-grow: 0 !important;
+}
+
+/* Mobile: slightly smaller, never huge */
+@media (max-width: 520px) {
+  #sellOpenBtn,
+  .sell-btn {
+    padding: 0 12px;
+    height: 36px;
+    font-size: 14px;
+  }
+}

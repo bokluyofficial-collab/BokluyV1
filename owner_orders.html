@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bokluy – Owner Orders</title>
+<link href="./owner_orders.css" rel="stylesheet"/><link href="./seller-modal.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="dash-wrap">
+<header class="dash-head">
+<div>
+<div class="dash-title">Owner Orders</div>
+<div class="dash-sub">Mark completed to award points</div>
+</div>
+<div class="dash-actions">
+<a class="btn ghost" href="index.html">Home</a>
+<button class="btn ghost" id="btnLogout">Logout</button>
+</div>
+</header><button class="btn ghost sell-btn" id="sellOpenBtn" type="button">ចង់លក់?</button>
+<section class="card">
+<div class="filters">
+<button class="btn ghost" data-filter="all">All</button>
+<button class="btn ghost" data-filter="pending">Pending</button>
+<button class="btn ghost" data-filter="completed">Completed</button>
+</div>
+<div class="status" id="status">Loading…</div>
+<div class="orders" id="list"></div>
+</section>
+</div>
+<!-- Sell Modal -->
+<div aria-hidden="true" class="modal" id="sellModal">
+<div class="modal-backdrop" id="sellCloseBg"></div>
+<div aria-labelledby="sellTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head">
+<div>
+<div class="modal-title" id="sellTitle">ទម្រង់ស្នើលក់</div>
+<div class="modal-sub">សូមបំពេញព័ត៌មានខាងក្រោម (តម្រូវអស់ទាំងអស់)</div>
+</div>
+<button class="modal-x" id="sellCloseBtn" type="button">×</button>
+</div>
+<form class="modal-body" id="sellForm">
+<label class="f">
+<span class="l">លេខទូរស័ព្ទ Telegram</span>
+<input class="i" id="sellPhone" placeholder="+855..." required="" type="tel"/>
+</label>
+<label class="f">
+<span class="l">ហ្គេម</span>
+<input class="i" id="sellGame" placeholder="Growtopia / MLBB / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">វត្ថុ / Item</span>
+<input class="i" id="sellItem" placeholder="DL / BGL / Diamonds / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">តម្លៃ USD</span>
+<input class="i" id="sellPrice" placeholder="ex: 10" required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">សារ / Message</span>
+<textarea class="i t" id="sellMessage" placeholder="ពណ៌នាព័ត៌មានបន្ថែម..." required="" rows="4"></textarea>
+</label>
+<div class="modal-actions">
+<button class="btn-secondary" id="sellCancel" type="button">បោះបង់</button>
+<button class="btn-primary" type="submit">ផ្ញើសំណើ</button>
+</div>
+<div class="modal-note" id="sellStatus"></div>
+</form>
+</div>
+</div>
+<script src="./owner_orders.js" type="module"></script><script src="./seller-modal.js" type="module"></script>
+</body>
+</html>

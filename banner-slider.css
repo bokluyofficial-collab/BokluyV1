@@ -1,0 +1,205 @@
+/* =========================================================
+   Banner Slider (Game Pages)
+   - 2+ banners with dots indicator
+   - Fade transition
+   ========================================================= */
+
+.banner-slider{
+  position: relative;
+  width: 100%;
+}
+
+/* Layer slides on top of each other without collapsing layout */
+.banner-slides{
+  display: grid;
+}
+
+.banner-slides > img{
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.banner-slides > img.active{
+  opacity: 1;
+}
+
+/* Dots (indicator) */
+.banner-dots{
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.25);
+  backdrop-filter: blur(4px);
+}
+
+.banner-dot{
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(255,255,255,.55);
+  transition: transform 120ms ease, background 160ms ease, opacity 160ms ease;
+}
+
+.banner-dot:hover{ opacity: .9; }
+.banner-dot:active{ transform: scale(.92); }
+
+.banner-dot.active{
+  background: #3b82f6; /* blue active dot like your sample */
+}
+
+/* Accessibility */
+.banner-dot:focus-visible{
+  outline: 3px solid rgba(59,130,246,.45);
+  outline-offset: 2px;
+}
+
+/* If a page uses a hero container but no styles (e.g., topup.css pages) */
+.topup-hero{
+  margin-top: 14px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(0,0,0,.14);
+  box-shadow: 0 18px 45px rgba(0,0,0,.20);
+}
+
+.topup-hero .topup-hero-img{
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Mobile tweaks */
+@media (max-width: 520px){
+  .banner-dots{
+    bottom: 8px;
+    gap: 7px;
+    padding: 5px 9px;
+  }
+  .banner-dot{
+    width: 8px;
+    height: 8px;
+  }
+}
+/* Growtopia: bigger banner, show FULL image (no heavy crop) */
+.banner-slider--growtopia {
+  height: 360px;                 /* desktop */
+  background: #fff;              /* or transparent / your page bg */
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.banner-slider--growtopia .banner-slide img {
+  width: 100%;
+  height: 360px;
+  object-fit: contain;           /* <-- shows whole image */
+  object-position: center;
+  background: #fff;              /* fills empty bars if aspect ratio differs */
+}
+
+/* Mobile */
+@media (max-width: 980px) {
+  .banner-slider--growtopia {
+    height: 140px;
+  }
+  .banner-slider--growtopia .banner-slide img {
+    height: 140px;
+    object-fit: contain;
+  }
+}
+/* =========================
+   Growtopia: show FULL image (no crop)
+   Put at VERY BOTTOM of banner-slider.css
+   ========================= */
+
+/* Stop the slider from acting like a fixed crop box */
+.banner-slider--growtopia{
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Let slides size themselves to the image */
+.banner-slider--growtopia .banner-track,
+.banner-slider--growtopia .banner-slide{
+  height: auto !important;
+}
+
+/* Full image: no cut off */
+.banner-slider--growtopia .banner-slide img{
+  width: 100% !important;
+  height: auto !important;        /* <-- key: don't force a height */
+  max-height: 420px;              /* desktop limit (increase if you want) */
+  object-fit: contain !important; /* <-- shows whole image */
+  object-position: center !important;
+  display: block;
+  background: #fff;               /* fills empty space if needed */
+}
+
+/* Mobile */
+@media (max-width: 980px){
+  .banner-slider--growtopia .banner-slide img{
+    max-height: 180px;            /* mobile limit */
+  }
+}
+/* =========================================
+   Banner slider: consistent on all devices
+   No cut-off (contain) + stable sizing
+   Put at VERY BOTTOM of banner-slider.css
+   ========================================= */
+
+.banner-slider {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+
+  /* stable sizing */
+  aspect-ratio: 16 / 5;          /* change if you want taller/shorter */
+  min-height: 140px;
+  max-height: 420px;
+}
+
+/* Track & slides fill the container */
+.banner-slider .banner-track,
+.banner-slider .banner-slide {
+  width: 100%;
+  height: 100%;
+}
+
+/* Images fill the container height/width */
+.banner-slider .banner-slide img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;            /* ✅ no cut off */
+  object-position: center;
+  display: block;
+
+  background: #fff;               /* bars are white if aspect ratio differs */
+}
+
+/* Mobile sizing */
+@media (max-width: 980px) {
+  .banner-slider {
+    aspect-ratio: 16 / 6;         /* slightly taller on mobile */
+    min-height: 110px;
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 520px) {
+  .banner-slider {
+    aspect-ratio: 16 / 7;         /* taller on small phones */
+    min-height: 95px;
+    max-height: 190px;
+  }
+}

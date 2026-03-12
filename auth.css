@@ -1,0 +1,217 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f4f6f9;
+}
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.auth-header {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  border: none;
+  background: #f1f3f6;
+  border-radius: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.auth-header h1 {
+  margin: 12px 0 4px;
+  font-size: 26px;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.auth-tabs {
+  display: flex;
+  background: #f1f3f6;
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tab.active {
+  background: #111827;
+  color: #fff;
+}
+
+.auth-form label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 14px;
+  display: block;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
+.auth-form input:focus {
+  border-color: #2563eb;
+}
+
+.captcha-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 16px;
+}
+
+.captcha-box img {
+  margin-left: auto;
+  width: 36px;
+}
+
+.primary-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.divider {
+  text-align: center;
+  margin: 16px 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.google-btn img {
+  width: 20px;
+}
+
+.message {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #2563eb;
+  text-align: center;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* =========================
+   Google button (modern style)
+   Targets your existing button: #googleLoginBtn
+========================= */
+#googleLoginBtn{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 12px 16px;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #3c4043;
+
+  border: 1px solid #dadce0;
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.20),
+    0 1px 3px rgba(60, 64, 67, 0.12);
+
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .06s ease, box-shadow .12s ease, background .12s ease;
+}
+
+#googleLoginBtn:hover{
+  background: #f8f9fa;
+  box-shadow:
+    0 2px 6px rgba(60, 64, 67, 0.22),
+    0 1px 3px rgba(60, 64, 67, 0.16);
+}
+
+#googleLoginBtn:active{
+  transform: translateY(1px);
+}
+
+#googleLoginBtn:disabled{
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.10),
+    0 1px 2px rgba(60, 64, 67, 0.08);
+}
+
+/* Google "G" icon (no HTML changes needed) */
+#googleLoginBtn::before{
+  content: "";
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+
+  /* Inline SVG Google G */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.73 1.22 9.25 3.61l6.91-6.91C36.2 2.43 30.45 0 24 0 14.62 0 6.51 5.38 2.56 13.22l8.02 6.23C12.5 13.36 17.77 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.5 24.5c0-1.6-.14-2.78-.44-4.02H24v7.64h12.93c-.26 2.06-1.66 5.17-4.76 7.25l7.33 5.68c4.39-4.05 6.99-10 6.99-16.55z'/%3E%3Cpath fill='%23FBBC05' d='M10.58 28.45A14.5 14.5 0 0 1 9.82 24c0-1.55.28-3.04.76-4.45l-8.02-6.23A23.96 23.96 0 0 0 0 24c0 3.91.94 7.6 2.56 10.78l8.02-6.33z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.45 0 11.86-2.13 15.81-5.79l-7.33-5.68c-1.96 1.37-4.59 2.32-8.48 2.32-6.23 0-11.5-3.86-13.42-9.4l-8.02 6.33C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E");
+}
+

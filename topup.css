@@ -1,0 +1,811 @@
+/* =========================================================
+   Bokluy Top Up – Unified Theme (TOPUP PAGES ONLY)
+   Dark gray background + white cards + yellow borders
+   Product cards: yellow/orange fill
+   Footer: yellow boxed "site-footer"
+   Supports: mlbb, freefire, pubg, mcgg, hok, deltaforce, growtopia
+   ========================================================= */
+
+:root{
+  --bg-1:#2f3033;          /* dark gray (not too black) */
+  --bg-2:#3a3b40;
+  --card:#ffffff;
+  --text:#111111;
+
+  --y:#FACC15;             /* yellow */
+  --y2:#F59E0B;            /* orange-yellow */
+
+  --shadow:0 12px 28px rgba(0,0,0,.18);
+  --radius:22px;
+
+  /* Optional topbar background image layer */
+  --topbar-bg-image: url("./images/topbar.png");
+  --topbar-bg-opacity: .18;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+html,body{ overflow-x:hidden; }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(250,204,21,.12), transparent 50%),
+    radial-gradient(900px 500px at 80% 20%, rgba(245,158,11,.10), transparent 55%),
+    linear-gradient(180deg, var(--bg-2), var(--bg-1));
+}
+
+/* =============================
+   Topbar (works for every prefix)
+============================= */
+:where(
+  .mlbb-topbar, .freefire-topbar, .pubg-topbar, .mcgg-topbar, .hok-topbar, .deltaforce-topbar, .growtopia-topbar
+){
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(47,48,51,.88);
+  backdrop-filter: blur(10px);
+  border-bottom: 2px solid rgba(250,204,21,.35);
+  box-shadow: 0 10px 26px rgba(0,0,0,.22);
+}
+
+/* optional image layer */
+:where(
+  .mlbb-topbar, .freefire-topbar, .pubg-topbar, .mcgg-topbar, .hok-topbar, .deltaforce-topbar, .growtopia-topbar
+)::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image: var(--topbar-bg-image);
+  background-size: cover;
+  background-position: center;
+  opacity: var(--topbar-bg-opacity);
+  pointer-events:none;
+  z-index: 0;
+}
+
+:where(
+  .mlbb-topbar-inner, .freefire-topbar-inner, .pubg-topbar-inner, .mcgg-topbar-inner, .hok-topbar-inner, .deltaforce-topbar-inner, .growtopia-topbar-inner
+){
+  position: relative;
+  z-index: 1;
+
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+:where(
+  .mlbb-brand, .freefire-brand, .pubg-brand, .mcgg-brand, .hok-brand, .deltaforce-brand, .growtopia-brand
+){
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  min-width: 0;
+  text-decoration:none;
+}
+
+:where(
+  .mlbb-logo, .freefire-logo, .pubg-logo, .mcgg-logo, .hok-logo, .deltaforce-logo, .growtopia-logo
+){
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  background:#fff;
+  border: 2px solid rgba(250,204,21,.85);
+  padding: 6px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.18);
+  flex: 0 0 auto;
+}
+
+:where(
+  .mlbb-brand-name, .freefire-brand-name, .pubg-brand-name, .mcgg-brand-name, .hok-brand-name, .deltaforce-brand-name, .growtopia-brand-name
+){
+  font-weight: 800;
+  letter-spacing: .01em;
+  color:#fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+:where(
+  .mlbb-nav, .freefire-nav, .pubg-nav, .mcgg-nav, .hok-nav, .deltaforce-nav, .growtopia-nav
+){
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+:where(
+  .mlbb-pill, .freefire-pill, .pubg-pill, .mcgg-pill, .hok-pill, .deltaforce-pill, .growtopia-pill
+){
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 9px 12px;
+  border-radius: 999px;
+  text-decoration:none;
+  font-weight: 800;
+  font-size: 13px;
+  color:#111;
+  background: rgba(255,255,255,.94);
+  border: 2px solid rgba(250,204,21,.35);
+  box-shadow: 0 8px 18px rgba(0,0,0,.14);
+  white-space: nowrap;
+}
+
+:where(
+  .mlbb-pill-primary, .freefire-pill-primary, .pubg-pill-primary, .mcgg-pill-primary, .hok-pill-primary, .deltaforce-pill-primary, .growtopia-pill-primary
+){
+  background: var(--y);
+  border-color: rgba(0,0,0,.75);
+}
+
+/* hide login pill (optional) */
+:where(
+  .mlbb-pill-primary,.freefire-pill-primary,.hok-pill-primary,.pubg-pill-primary,.mcgg-pill-primary,.deltaforce-pill-primary,.growtopia-pill-primary
+){
+  /* comment out next line if you WANT login button */
+  /* display:none !important; */
+}
+
+@media (max-width: 560px){
+  :where(
+    .mlbb-topbar-inner, .freefire-topbar-inner, .pubg-topbar-inner, .mcgg-topbar-inner, .hok-topbar-inner, .deltaforce-topbar-inner, .growtopia-topbar-inner
+  ){
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+  :where(
+    .mlbb-brand-name, .freefire-brand-name, .pubg-brand-name, .mcgg-brand-name, .hok-brand-name, .deltaforce-brand-name, .growtopia-brand-name
+  ){
+    max-width: 160px;
+  }
+  @media (max-width: 360px){
+    :where(
+      .mlbb-brand-name, .freefire-brand-name, .pubg-brand-name, .mcgg-brand-name, .hok-brand-name, .deltaforce-brand-name, .growtopia-brand-name
+    ){
+      max-width: 120px;
+    }
+    :where(
+      .mlbb-pill, .freefire-pill, .pubg-pill, .mcgg-pill, .hok-pill, .deltaforce-pill, .growtopia-pill
+    ){
+      padding: 7px 9px;
+      font-size: 11px;
+    }
+  }
+}
+
+/* =============================
+   Layout grid
+============================= */
+:where(
+  .mlbb-page, .freefire-page, .pubg-page, .mcgg-page, .hok-page, .deltaforce-page, .growtopia-page
+){
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 16px 26px;
+}
+
+:where(
+  .mlbb-grid, .freefire-grid, .pubg-grid, .mcgg-grid, .hok-grid, .deltaforce-grid, .growtopia-grid
+){
+  display:grid;
+  grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  gap: 16px;
+  align-items:start;
+}
+
+@media (max-width: 980px){
+  :where(.mlbb-grid,.freefire-grid,.pubg-grid,.mcgg-grid,.hok-grid,.deltaforce-grid,.growtopia-grid){
+    grid-template-columns: 1fr;
+  }
+}
+
+:where(
+  .mlbb-left, .freefire-left, .pubg-left, .mcgg-left, .hok-left, .deltaforce-left, .growtopia-left,
+  .mlbb-right, .freefire-right, .pubg-right, .mcgg-right, .hok-right, .deltaforce-right, .growtopia-right
+){
+  display:flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* =============================
+   Cards
+============================= */
+:where(
+  .mlbb-card, .freefire-card, .pubg-card, .mcgg-card, .hok-card, .deltaforce-card, .growtopia-card
+){
+  background: var(--card);
+  border: 3px solid var(--y);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  min-width: 0;
+}
+
+:where(
+  .mlbb-card-head, .freefire-card-head, .pubg-card-head, .mcgg-card-head, .hok-card-head, .deltaforce-card-head, .growtopia-card-head
+){
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 14px 14px;
+  background: #f3f4f6;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+:where(
+  .mlbb-card-title, .freefire-card-title, .pubg-card-title, .mcgg-card-title, .hok-card-title, .deltaforce-card-title, .growtopia-card-title
+){
+  margin:0;
+  font-weight: 1000;
+  font-size: 22px;
+}
+
+:where(
+  .mlbb-step, .freefire-step, .pubg-step, .mcgg-step, .hok-step, .deltaforce-step, .growtopia-step,
+  .mlbb-badge, .freefire-badge, .pubg-badge, .mcgg-badge, .hok-badge, .deltaforce-badge, .growtopia-badge
+){
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 1000;
+  background: rgba(250,204,21,.20);
+  border: 2px solid rgba(0,0,0,.14);
+}
+
+/* Guide */
+:where(
+  .mlbb-guide, .freefire-guide, .pubg-guide, .mcgg-guide, .hok-guide, .deltaforce-guide, .growtopia-guide
+){ padding: 14px; }
+
+:where(
+  .mlbb-guide-banner, .freefire-guide-banner, .pubg-guide-banner, .mcgg-guide-banner, .hok-guide-banner, .deltaforce-guide-banner, .growtopia-guide-banner
+){
+  width:100%;
+  height: 230px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 3px solid rgba(0,0,0,.14);
+  background: #e5e7eb;
+}
+
+:where(
+  .mlbb-guide-text, .freefire-guide-text, .pubg-guide-text, .mcgg-guide-text, .hok-guide-text, .deltaforce-guide-text, .growtopia-guide-text
+){
+  margin-top: 12px;
+  font-weight: 900;
+  color: rgba(17,17,17,.80);
+  line-height: 1.8;
+}
+
+:where(
+  .mlbb-list, .freefire-list, .pubg-list, .mcgg-list, .hok-list, .deltaforce-list, .growtopia-list
+){
+  margin:0;
+  padding: 14px 18px 18px;
+  line-height: 1.8;
+  font-weight: 900;
+  color: rgba(17,17,17,.78);
+}
+
+/* =============================
+   Step 1 form
+============================= */
+:where(
+  .mlbb-form, .freefire-form, .pubg-form, .mcgg-form, .hok-form, .deltaforce-form, .growtopia-form
+){
+  padding: 14px;
+  display:grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  align-items:center;
+}
+
+@media (max-width: 720px){
+  :where(.mlbb-form,.freefire-form,.pubg-form,.mcgg-form,.hok-form,.deltaforce-form,.growtopia-form){
+    grid-template-columns: 1fr;
+  }
+}
+
+:where(
+  .mlbb-input, .freefire-input, .pubg-input, .mcgg-input, .hok-input, .deltaforce-input, .growtopia-input
+){
+  width:100%;
+  padding: 14px 14px;
+  border-radius: 14px;
+  border: 2px solid rgba(0,0,0,.10);
+  background: #fff;
+  outline: none;
+  font-weight: 900;
+}
+
+:where(
+  .mlbb-input:focus, .freefire-input:focus, .pubg-input:focus, .mcgg-input:focus, .hok-input:focus, .deltaforce-input:focus, .growtopia-input:focus
+){
+  border-color: rgba(250,204,21,.85);
+  box-shadow: 0 0 0 4px rgba(250,204,21,.18);
+}
+
+:where(
+  .mlbb-btn, .freefire-btn, .pubg-btn, .mcgg-btn, .hok-btn, .deltaforce-btn, .growtopia-btn
+){
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-weight: 1000;
+  cursor: pointer;
+}
+
+:where(
+  .mlbb-btn-primary, .freefire-btn-primary, .pubg-btn-primary, .mcgg-btn-primary, .hok-btn-primary, .deltaforce-btn-primary, .growtopia-btn-primary
+){
+  background: var(--y);
+  color: #111;
+  border: 2px solid rgba(0,0,0,.20);
+  box-shadow: 0 10px 18px rgba(0,0,0,.12);
+}
+
+:where(
+  .mlbb-btn-secondary, .freefire-btn-secondary, .pubg-btn-secondary, .mcgg-btn-secondary, .hok-btn-secondary, .deltaforce-btn-secondary, .growtopia-btn-secondary
+){
+  background: #fff;
+  color: #111;
+  border: 2px solid rgba(0,0,0,.14);
+}
+
+:where(
+  .mlbb-btn-primary[disabled],
+  .freefire-btn-primary[disabled],
+  .pubg-btn-primary[disabled],
+  .mcgg-btn-primary[disabled],
+  .hok-btn-primary[disabled],
+  .deltaforce-btn-primary[disabled],
+  .growtopia-btn-primary[disabled],
+  .mlbb-btn-secondary[disabled],
+  .freefire-btn-secondary[disabled],
+  .pubg-btn-secondary[disabled],
+  .mcgg-btn-secondary[disabled],
+  .hok-btn-secondary[disabled],
+  .deltaforce-btn-secondary[disabled],
+  .growtopia-btn-secondary[disabled]
+){
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* Status + verified */
+:where(
+  .mlbb-statusline, .freefire-statusline, .pubg-statusline, .mcgg-statusline, .hok-statusline, .deltaforce-statusline, .growtopia-statusline
+){ padding: 0 14px 14px; }
+
+:where(
+  .mlbb-status, .freefire-status, .pubg-status, .mcgg-status, .hok-status, .deltaforce-status, .growtopia-status
+){
+  font-weight: 900;
+  color: rgba(17,17,17,.78);
+  min-height: 18px;
+}
+
+:where(
+  .mlbb-verified, .freefire-verified, .pubg-verified, .mcgg-verified, .hok-verified, .deltaforce-verified, .growtopia-verified
+){
+  margin: 0 14px 14px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 2px dashed rgba(0,0,0,.18);
+  background: rgba(250,204,21,.10);
+  font-weight: 1000;
+}
+
+/* =============================
+   Products grid (JS renders #productsScroll .topup-product)
+============================= */
+#productsScroll{
+  padding: 14px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px){
+  #productsScroll{ grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 760px; }
+}
+@media (max-width: 520px){
+  #productsScroll{ grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; width: calc(100vw - 20px); }
+}
+@media (max-width: 360px){
+  #productsScroll{ grid-template-columns: 1fr; width: calc(100vw - 20px); }
+}
+
+/* Card style: top 70% light, bottom 30% dark */
+#productsScroll .topup-product{
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  min-height: 150px;
+
+  display: grid;
+  grid-template-rows: 70% 30%;
+  cursor: pointer;
+  width: 100%;
+  max-width: 100%;
+}
+
+#productsScroll .topup-product::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(#FFE9A8, #FFD86E);
+  z-index: 0;
+}
+
+#productsScroll .topup-product::after{
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 30%;
+  background: linear-gradient(#D89A00, #B77800);
+  z-index: 0;
+}
+
+#productsScroll .topup-product > *{
+  position: relative;
+  z-index: 1;
+}
+
+#productsScroll .topup-product:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+}
+#productsScroll .topup-product.active{
+  outline: 4px solid rgba(0,0,0,.22);
+}
+
+#productsScroll .topup-product-left{
+  grid-row: 1;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+}
+
+/* Your JS might use .topup-product-img or .topup-product-icon; support both */
+#productsScroll :is(.topup-product-img,.topup-product-icon){
+  height: 80%;
+  width: auto;
+  max-width: 92%;
+  object-fit: contain;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 12px;
+  flex: 0 0 auto;
+}
+
+#productsScroll .topup-product-title{
+  grid-row: 2;
+  margin: 0;
+  padding: 6px 8px 2px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.15;
+
+  /* allow 2 lines */
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+#productsScroll .topup-product-price{
+  grid-row: 2;
+  margin: 0;
+  padding: 0 8px 10px;
+
+  border: none !important;
+  background: transparent !important;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  color: #fff !important;
+  font-weight: 900;
+  font-size: 13px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+
+/* =============================
+   Payment area
+============================= */
+:where(
+  .mlbb-paybox, .freefire-paybox, .pubg-paybox, .mcgg-paybox, .hok-paybox, .deltaforce-paybox, .growtopia-paybox
+){
+  padding: 14px;
+  display:grid;
+  gap: 14px;
+}
+
+:where(
+  .mlbb-payrow, .freefire-payrow, .pubg-payrow, .mcgg-payrow, .hok-payrow, .deltaforce-payrow, .growtopia-payrow
+){
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background:#fff;
+  border: 3px solid var(--y);
+  border-radius: 18px;
+  padding: 12px;
+  min-width: 0;
+}
+
+:where(
+  .mlbb-paylogo, .freefire-paylogo, .pubg-paylogo, .mcgg-paylogo, .hok-paylogo, .deltaforce-paylogo, .growtopia-paylogo
+){
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  border: 2px solid var(--y);
+  background:#fff;
+  padding: 6px;
+  object-fit: contain;
+}
+
+:where(
+  .mlbb-paymeta, .freefire-paymeta, .pubg-paymeta, .mcgg-paymeta, .hok-paymeta, .deltaforce-paymeta, .growtopia-paymeta
+){
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:where(
+  .mlbb-paytitle, .freefire-paytitle, .pubg-paytitle, .mcgg-paytitle, .hok-paytitle, .deltaforce-paytitle, .growtopia-paytitle
+){
+  font-weight: 1000;
+  font-size: 18px;
+}
+
+:where(
+  .mlbb-paydesc, .freefire-paydesc, .pubg-paydesc, .mcgg-paydesc, .hok-paydesc, .deltaforce-paydesc, .growtopia-paydesc
+){
+  margin-top: 4px;
+  font-weight: 900;
+  color: rgba(17,17,17,.70);
+}
+
+:where(
+  .mlbb-paytag, .freefire-paytag, .pubg-paytag, .mcgg-paytag, .hok-paytag, .deltaforce-paytag, .growtopia-paytag
+){
+  font-weight: 1000;
+  border: 2px solid var(--y);
+  background: rgba(250,204,21,.22);
+  padding: 8px 12px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* Terms */
+:where(
+  .mlbb-checkline, .freefire-checkline, .pubg-checkline, .mcgg-checkline, .hok-checkline, .deltaforce-checkline, .growtopia-checkline
+){
+  border: 2px dashed rgba(0,0,0,.22);
+  background: rgba(250,204,21,.12);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+:where(
+  .mlbb-terms, .freefire-terms, .pubg-terms, .mcgg-terms, .hok-terms, .deltaforce-terms, .growtopia-terms
+){
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap: 12px;
+  font-weight: 1000;
+  width: 100%;
+  text-align:left;
+}
+
+:where(
+  .mlbb-terms input, .freefire-terms input, .pubg-terms input, .mcgg-terms input, .hok-terms input, .deltaforce-terms input, .growtopia-terms input
+){
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+/* Total row */
+:where(
+  .mlbb-total, .freefire-total, .pubg-total, .mcgg-total, .hok-total, .deltaforce-total, .growtopia-total
+){
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  background:#fff;
+  border: 2px solid rgba(0,0,0,.10);
+  border-radius: 18px;
+  padding: 12px;
+}
+
+:where(
+  .mlbb-total-label, .freefire-total-label, .pubg-total-label, .mcgg-total-label, .hok-total-label, .deltaforce-total-label, .growtopia-total-label
+){
+  font-weight: 1000;
+  letter-spacing: .08em;
+  color: rgba(17,17,17,.70);
+}
+
+:where(
+  .mlbb-total-value, .freefire-total-value, .pubg-total-value, .mcgg-total-value, .hok-total-value, .deltaforce-total-value, .growtopia-total-value
+){
+  font-weight: 1000;
+  font-size: 30px;
+}
+
+/* =============================
+   Mobile: left guide cards become top/bottom banners
+============================= */
+@media (max-width: 980px){
+
+  :where(.mlbb-grid,.freefire-grid,.pubg-grid,.mcgg-grid,.hok-grid,.deltaforce-grid,.growtopia-grid){
+    display: flex;
+    flex-direction: column;
+  }
+
+  :where(.mlbb-left,.freefire-left,.pubg-left,.mcgg-left,.hok-left,.deltaforce-left,.growtopia-left){
+    display: contents;
+  }
+
+  :where(.mlbb-right,.freefire-right,.pubg-right,.mcgg-right,.hok-right,.deltaforce-right,.growtopia-right){
+    order: 2;
+  }
+
+  /* first card becomes top banner */
+  :where(.mlbb-left,.freefire-left,.pubg-left,.mcgg-left,.hok-left,.deltaforce-left,.growtopia-left) > :nth-child(1){
+    order: 1;
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  /* second card becomes bottom banner */
+  :where(.mlbb-left,.freefire-left,.pubg-left,.mcgg-left,.hok-left,.deltaforce-left,.growtopia-left) > :nth-child(2){
+    order: 3;
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  /* make guide image smaller on mobile */
+  :where(.mlbb-guide-banner,.freefire-guide-banner,.pubg-guide-banner,.mcgg-guide-banner,.hok-guide-banner,.deltaforce-guide-banner,.growtopia-guide-banner){
+    height: 90px;
+    border-radius: 14px;
+  }
+
+  /* tighten text so it fits */
+  :where(.mlbb-guide-text,.freefire-guide-text,.pubg-guide-text,.mcgg-guide-text,.hok-guide-text,.deltaforce-guide-text,.growtopia-guide-text){
+    margin-top: 6px;
+    line-height: 1.25;
+    font-size: 12.5px;
+    font-weight: 800;
+  }
+  :where(.mlbb-guide-text p,.freefire-guide-text p,.pubg-guide-text p,.mcgg-guide-text p,.hok-guide-text p,.deltaforce-guide-text p,.growtopia-guide-text p){
+    margin: 0 0 4px;
+  }
+
+  :where(.mlbb-list,.freefire-list,.pubg-list,.mcgg-list,.hok-list,.deltaforce-list,.growtopia-list){
+    padding: 10px 12px 12px;
+    line-height: 1.25;
+    font-size: 12.5px;
+    font-weight: 800;
+  }
+  :where(.mlbb-list li,.freefire-list li,.pubg-list li,.mcgg-list li,.hok-list li,.deltaforce-list li,.growtopia-list li){
+    margin: 2px 0;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+/* =============================
+   Yellow Footer (site-footer)
+============================= */
+.site-footer{
+  max-width: 1200px;
+  margin: 18px auto 26px;
+  background: var(--y);
+  border: 4px solid #111;
+  border-radius: 28px;
+  padding: 18px 18px 14px;
+  text-align:center;
+  box-shadow: 0 20px 40px rgba(0,0,0,.22);
+}
+
+.footer-social{
+  display:flex;
+  justify-content:center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.social-circle{
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background:#fff;
+  border: 3px solid #111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+}
+
+.social-circle svg{
+  width: 22px;
+  height: 22px;
+  fill:#111;
+}
+
+.footer-copy{
+  font-weight: 1000;
+  margin: 6px 0 10px;
+}
+
+.footer-links{
+  font-weight: 1000;
+  margin-bottom: 12px;
+}
+
+.footer-links a{
+  color:#111;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.footer-pay{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap: 10px;
+  font-weight: 1000;
+  flex-wrap: wrap;
+}
+
+.footer-pay img{
+  height: 30px;
+  width: auto;
+}

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bokluy - Premium Digital Marketplace</title>
+<link href="style.css" rel="stylesheet"/><link href="./seller-modal.css" rel="stylesheet"/>
+</head>
+<body>
+<!-- Main Marketplace Page -->
+<div class="page active" id="mainPage">
+<header>
+<div class="container">
+<div class="header-content">
+<div class="logo" onclick="showPage('mainPage')">
+<img alt="Bokluy Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" src="./images/logo.png"/>
+<span class="logo-text">Bokluy</span>
+</div>
+<div class="nav-buttons header-actions">
+<!-- ADD LISTING (admin-only shown by script.js) -->
+<button class="btn btn-success" id="addListingBtn" style="display:none;">
+<span class="btn-icon">✨</span>
+<span>Add Listing</span>
+</button>
+<!-- HOME -->
+<a class="btn btn-dark" href="./home.html" style="text-decoration:none;">
+<span class="btn-icon">🏠</span>
+<span>Home</span>
+</a>
+<button class="btn btn-dark sell-btn" id="sellOpenBtn" type="button">ចង់លក់?</button>
+<!-- CHAT -->
+<button class="btn btn-primary" onclick="showPage('chatPage')">
+<span class="btn-icon">💬</span>
+<span>Support Chat</span>
+</button>
+<!-- LOGIN (LOGGED OUT) -->
+<a class="btn btn-dark" href="./auth.html" id="login-link" style="display:inline-flex;">
+            Login
+          </a>
+<!-- USER MENU (LOGGED IN) -->
+<div class="user-menu" id="user-menu" style="display:none;">
+<span class="user-name" id="user-name">User</span>
+<button class="logout-btn" id="logout-btn" type="button">Logout</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Search & Filters -->
+<div class="search-section">
+<div class="search-header">
+<h2 class="section-title">🔍 Find Your Perfect Deal</h2>
+<p class="section-subtitle">Search across thousands of listings</p>
+</div>
+<div class="search-bar-container">
+<span class="search-icon">🔎</span>
+<input class="search-bar" id="searchInput" placeholder="Search for items, games, or deals..." type="text"/>
+</div>
+<!-- Items Grid -->
+<div class="listings-section">
+<div class="section-header">
+<h2 class="section-title">🛍️ Available Listings</h2>
+<div class="view-toggles">
+<button class="view-btn active" onclick="setGridView('grid')" type="button">
+<span>⊞</span> Grid
+          </button>
+<button class="view-btn" onclick="setGridView('list')" type="button">
+<span>☰</span> List
+          </button>
+</div>
+</div>
+<div class="items-grid" id="listingsGrid"></div>
+</div>
+</div>
+</header></div>
+<!-- Add Listing Page -->
+<div class="page" id="addListingPage">
+<header>
+<div class="container">
+<div class="header-content">
+<div class="logo" onclick="showPage('mainPage')">
+<img alt="Bokluy Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" src="./images/logo.png"/>
+<span class="logo-text">🎮 Bokluy</span>
+</div>
+<div class="nav-buttons">
+<button class="btn btn-primary" onclick="showPage('mainPage')" type="button">
+<span class="btn-icon">←</span>
+<span>Back to Marketplace</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="form-page-wrapper">
+<div class="form-sidebar">
+<div class="form-sidebar-content">
+<div class="form-sidebar-icon">✨</div>
+<h3>Create Your Listing</h3>
+<p>Fill out the form to list your item on the marketplace</p>
+<div class="form-tips">
+<div class="tip-item"><span class="tip-icon">💡</span><span>Be clear and detailed</span></div>
+<div class="tip-item"><span class="tip-icon">📸</span><span>Accurate pricing helps</span></div>
+<div class="tip-item"><span class="tip-icon">⚡</span><span>Respond quickly to buyers</span></div>
+</div>
+</div>
+</div>
+<div class="form-page-container">
+<h1 class="page-title">Add New Listing</h1>
+<form class="listing-form" id="listingForm">
+<div class="form-section">
+<h3 class="form-section-title">📦 Item Details</h3>
+<div class="form-group">
+<label>🎯 Select Game *</label>
+<select id="listingGame" required="">
+<option value="">Choose a game...</option>
+</select>
+</div>
+<div class="form-group">
+<label>📝 Item Name *</label>
+<div class="autocomplete-container">
+<input autocomplete="off" id="listingItem" placeholder="Start typing item name..." required="" type="text"/>
+<ul class="autocomplete-list" id="autocompleteList"></ul>
+</div>
+</div>
+<div class="form-group">
+<label>🏷️ Listing Type *</label>
+<select id="listingType" required="">
+<option value="">Choose type...</option>
+<option value="BUYING">🟢 Buying</option>
+<option value="SELLING">🔴 Selling</option>
+</select>
+</div>
+</div>
+<div class="form-section">
+<h3 class="form-section-title">💰 Pricing &amp; Quantity</h3>
+<div class="form-row">
+<div class="form-group">
+<label>💵 Price *</label>
+<input id="listingPrice" min="0" placeholder="1000" required="" step="0.01" type="number"/>
+</div>
+<div class="form-group">
+<label>📊 Quantity *</label>
+<input id="listingQuantity" min="1" placeholder="1" required="" type="number" value="1"/>
+</div>
+</div>
+</div>
+<div class="form-section">
+<h3 class="form-section-title">📞 Contact Information</h3>
+<div class="form-group">
+<label>💬 Contact Method *</label>
+<select id="contactMethod" required="">
+<option value="">Choose contact method...</option>
+<option value="chat">💬 In-Website Chat</option>
+<option value="discord">🎮 Discord</option>
+</select>
+</div>
+<div class="form-group" id="discordLabel" style="display:none;">
+<label>🎮 Discord Username *</label>
+<input id="discordUsername" placeholder="username#1234" type="text"/>
+</div>
+<div class="form-group">
+<label>📝 Additional Notes (Optional)</label>
+<textarea id="listingNotes" placeholder="Any additional information about your item..."></textarea>
+</div>
+</div>
+<button class="btn btn-submit" type="submit">
+<span class="btn-icon">✅</span>
+<span>Submit Listing</span>
+</button>
+</form>
+</div>
+</div>
+</div>
+</div>
+<!-- Chat Page -->
+<div class="page" id="chatPage">
+<header>
+<div class="container">
+<div class="header-content">
+<div class="logo" onclick="showPage('mainPage')">
+<img alt="Bokluy Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" src="./images/logo.png"/>
+<span class="logo-text">🎮 Bokluy</span>
+</div>
+<div class="nav-buttons">
+<button class="btn btn-primary" onclick="showPage('mainPage')" type="button">
+<span class="btn-icon">←</span>
+<span>Back to Marketplace</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<div class="container">
+<div class="chat-page-header">
+<h1 class="page-title" id="chatPageTitle">💬 Chat</h1>
+<p class="page-subtitle" id="chatPageSubtitle">Connect instantly</p>
+</div>
+<div class="chat-container">
+<div class="chat-rooms-panel" id="chatRoomsPanel">
+<div class="chat-panel-header">
+<h2>💬 Your Conversations</h2>
+<span class="online-indicator" id="chatOnlineIndicator">🟢 Online</span>
+</div>
+<div class="create-room-section" id="createRoomSection">
+<input class="chat-input" id="newRoomName" placeholder="Create new room..." type="text"/>
+<button class="btn btn-primary" id="createRoomBtn" type="button"><span>+</span></button>
+</div>
+<div class="rooms-list" id="chatRoomsList">
+<div class="no-rooms">
+<div class="empty-state-icon">💭</div>
+<p>No chat rooms yet</p>
+<small>Create one to get started!</small>
+</div>
+</div>
+</div>
+<div class="chat-messages-panel">
+<div class="chat-panel-header">
+<div class="chat-header-info">
+<h2 id="chatTitle">Select a chat room</h2>
+<span class="chat-status" id="chatStatusText">Start a conversation</span>
+</div>
+</div>
+<div class="chat-messages" id="chatMessages">
+<div class="no-messages">
+<div class="empty-state-icon">📭</div>
+<p>No messages yet</p>
+<small>Select a room to start chatting</small>
+</div>
+</div>
+<div class="chat-input-section">
+<input class="chat-input" id="chatInput" placeholder="Type your message..." type="text"/>
+<button class="btn btn-primary" id="sendChatBtn" type="button"><span>📤</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Confirm Modal -->
+<div class="modal-overlay" hidden="" id="confirmModal">
+<div aria-labelledby="confirmTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-header">
+<h3 class="modal-title" id="confirmTitle">Confirm</h3>
+<button aria-label="Close" class="modal-close" id="confirmCloseBtn" type="button">×</button>
+</div>
+<p class="modal-message" id="confirmMessage">Are you sure?</p>
+<div class="modal-actions">
+<button class="modal-btn" id="confirmCancelBtn" type="button">Cancel</button>
+<button class="modal-btn danger" id="confirmOkBtn" type="button">Delete</button>
+</div>
+</div>
+</div>
+<!-- Action Modal -->
+<div class="modal-overlay" hidden="" id="actionModal">
+<div class="modal-card">
+<div class="modal-header">
+<h3 class="modal-title" id="modalTitle">Done</h3>
+<button class="modal-close" id="modalCloseBtn" type="button">×</button>
+</div>
+<p class="modal-message" id="modalMessage">Action completed.</p>
+<div class="modal-actions">
+<button class="modal-btn primary" id="modalOkBtn" type="button">OK</button>
+</div>
+</div>
+</div>
+<!-- Scripts (load once, in order) -->
+<!-- Sell Modal -->
+<div aria-hidden="true" class="modal" id="sellModal">
+<div class="modal-backdrop" id="sellCloseBg"></div>
+<div aria-labelledby="sellTitle" aria-modal="true" class="modal-card" role="dialog">
+<div class="modal-head">
+<div>
+<div class="modal-title" id="sellTitle">ទម្រង់ស្នើលក់</div>
+<div class="modal-sub">សូមបំពេញព័ត៌មានខាងក្រោម (តម្រូវអស់ទាំងអស់)</div>
+</div>
+<button class="modal-x" id="sellCloseBtn" type="button">×</button>
+</div>
+<form class="modal-body" id="sellForm">
+<label class="f">
+<span class="l">លេខទូរស័ព្ទ Telegram</span>
+<input class="i" id="sellPhone" placeholder="+855..." required="" type="tel"/>
+</label>
+<label class="f">
+<span class="l">ហ្គេម</span>
+<input class="i" id="sellGame" placeholder="Growtopia / MLBB / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">វត្ថុ / Item</span>
+<input class="i" id="sellItem" placeholder="DL / BGL / Diamonds / ..." required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">តម្លៃ USD</span>
+<input class="i" id="sellPrice" placeholder="ex: 10" required="" type="text"/>
+</label>
+<label class="f">
+<span class="l">សារ / Message</span>
+<textarea class="i t" id="sellMessage" placeholder="ពណ៌នាព័ត៌មានបន្ថែម..." required="" rows="4"></textarea>
+</label>
+<div class="modal-actions">
+<button class="btn-secondary" id="sellCancel" type="button">បោះបង់</button>
+<button class="btn-primary" type="submit">ផ្ញើសំណើ</button>
+</div>
+<div class="modal-note" id="sellStatus"></div>
+</form>
+</div>
+</div>
+<script src="./products/blox_fruits.js"></script>
+<script src="./products/anime_last_stand.js"></script>
+<script src="./chat/chat.js" type="module"></script>
+<script src="./script.js" type="module"></script><script src="./seller-modal.js" type="module"></script>
+<!-- Top Up Page -->
+<div class="page" id="topupPage">
+<header>
+<div class="container">
+<div class="header-content">
+<div class="logo" onclick="showPage('mainPage')">
+<img alt="Bokluy Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" src="./images/logo.png"/>
+<span class="logo-text">Bokluy</span>
+</div>
+<div class="nav-buttons">
+<button class="btn btn-primary" onclick="showPage('mainPage')" type="button">
+<span class="btn-icon">←</span>
+<span>Back</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main>
+<div class="container">
+<div class="page-header">
+<h1 class="page-title">🛒 Top Up Request</h1>
+<p class="page-subtitle">Submit your details — we’ll confirm and process your top up.</p>
+</div>
+<div class="card form-card">
+<form class="listing-form" id="topupForm">
+<div class="form-grid">
+<div class="form-group">
+<label>🎮 Game</label>
+<select id="topupGame" required="">
+<option value="">Choose a game...</option>
+<option value="MLBB">Mobile Legends (MLBB)</option>
+<option value="PUBG">PUBG Mobile</option>
+<option value="Free Fire">Free Fire</option>
+<option value="Other">Other</option>
+</select>
+</div>
+<div class="form-group">
+<label>🆔 Player ID</label>
+<input id="topupPlayerId" placeholder="Your in-game ID" required="" type="text"/>
+</div>
+<div class="form-group">
+<label>🌍 Server / Zone (optional)</label>
+<input id="topupServer" placeholder="Example: 1234 (optional)" type="text"/>
+</div>
+<div class="form-group">
+<label>💎 Amount / Package</label>
+<input id="topupAmount" placeholder="Example: 500 diamonds / Weekly Pass" required="" type="text"/>
+</div>
+</div>
+<div class="form-group">
+<label>📝 Note (optional)</label>
+<textarea id="topupNote" placeholder="Any extra info (screenshot details, preferred time, etc.)" rows="4"></textarea>
+</div>
+<div class="form-actions">
+<button class="btn btn-success" type="submit">
+<span class="btn-icon">✅</span>
+<span>Submit Request</span>
+</button>
+</div>
+</form>
+</div>
+<div class="card">
+<h3 class="card-title">📌 After you submit</h3>
+<ul class="simple-list">
+<li>We’ll review your request.</li>
+<li>We’ll message you in Support Chat to confirm price and payment.</li>
+<li>Status will update in your Orders list (coming soon).</li>
+</ul>
+</div>
+</div>
+</main>
+</div>
+<!-- Orders Page (Owner Only) -->
+<div class="page" id="ordersPage">
+<header>
+<div class="container">
+<div class="header-content">
+<div class="logo" onclick="showPage('mainPage')">
+<img alt="Bokluy Logo" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" src="./images/logo.png"/>
+<span class="logo-text">Bokluy</span>
+</div>
+<div class="nav-buttons">
+<button class="btn btn-primary" onclick="showPage('mainPage')" type="button">
+<span class="btn-icon">←</span>
+<span>Back</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<main>
+<div class="container">
+<div class="page-header">
+<h1 class="page-title">📦 Orders</h1>
+<p class="page-subtitle">Owner dashboard for top up requests</p>
+</div>
+<div class="card">
+<div class="orders-toolbar">
+<select id="ordersStatusFilter">
+<option value="all">All</option>
+<option value="pending">Pending</option>
+<option value="processing">Processing</option>
+<option value="completed">Completed</option>
+<option value="cancelled">Cancelled</option>
+</select>
+<button class="btn btn-dark" id="ordersRefreshBtn" type="button">Refresh</button>
+</div>
+<div class="orders-list" id="ordersList">
+<div class="empty-state">
+<div class="empty-state-icon">📭</div>
+<p>No orders yet</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body>
+</html>
