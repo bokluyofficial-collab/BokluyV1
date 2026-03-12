@@ -260,7 +260,7 @@ window.bloxFruitsProducts = [
   },
     P_ID: 44,
     P_name: "Buddha",
-    game: "Blox Fruits",
+    game: "Blox Fruits",   
     image: "./products/buddha.png"
 },
   
@@ -268,5 +268,6 @@ window.bloxFruitsProducts = [
 
 // Debug check (safe)
 console.log("✅ Blox Fruits products loaded:", window.bloxFruitsProducts.length);
+
 
 
