@@ -9,28 +9,28 @@
     content="Bokluy marketplace for buying and selling digital game items."
   />
   <link rel="stylesheet" href="./indexO.css" />
+  <link rel="stylesheet" href="./seller-modal.css" />
 </head>
 <body>
   <div class="site-shell">
     <header class="site-header">
       <div class="container nav-row">
-        <a class="brand" href="./index.html" aria-label="Bokluy home">
-          <span class="brand-mark">B</span>
-          <span>
+        <a class="brand" href="./home.html" aria-label="Bokluy home">
+          <img class="brand-logo" src="./images/logo.png" alt="Bokluy" />
+          <span class="brand-text">
             <strong>Bokluy</strong>
-            <small>Digital marketplace</small>
+            
           </span>
         </a>
 
         <nav class="nav-links" aria-label="Primary">
           <a href="./home.html">Home</a>
-          <a href="#browse">Browse</a>
-          <a href="#how-it-works">How it works</a>
+          
         </nav>
 
         <div class="nav-actions">
-          <button class="ghost-btn sell-btn" id="sellOpenBtn" type="button">ចង់លក់?</button>
-          <button class="ghost-btn" id="supportBtn" type="button">Support</button>
+          <button class="ghost-btn sell-btn" id="sellOpenBtn" type="button">លក់</button>
+          <button class="ghost-btn" id="supportBtn" type="button">Help</button>
           <a class="ghost-btn" id="login-link" href="./auth.html">Login</a>
 
           <div class="user-menu" id="user-menu" hidden>
@@ -101,10 +101,11 @@
           </div>
 
           <div class="feedback-row">
-            <p class="results-copy" id="resultsCopy">Loading listings...</p>
-            <div class="view-switch" role="tablist" aria-label="Listing view mode">
-              <button class="view-btn is-active" id="gridViewBtn" type="button">Grid</button>
-              <button class="view-btn" id="listViewBtn" type="button">List</button>
+            <div class="category-switch" id="categorySwitch">
+              <button class="category-btn is-active" type="button" data-category="Item">Item</button>
+              <button class="category-btn" type="button" data-category="Accounts">Accounts</button>
+              <button class="category-btn" type="button" data-category="Services">Services</button>
+              <button class="category-btn" type="button" data-category="Robux">Robux</button>
             </div>
           </div>
 
@@ -112,29 +113,28 @@
           <div class="listings-grid" id="listingsGrid"></div>
         </div>
       </section>
-
-      <section class="how-section" id="how-it-works">
-        <div class="container how-grid">
-          <article>
-            <span>01</span>
-            <h3>Browse</h3>
-            <p>Find items by game, type, price, or seller in one consistent layout.</p>
-          </article>
-
-          <article>
-            <span>02</span>
-            <h3>Review</h3>
-            <p>Open details to check quantity, notes, contact method, and listing freshness.</p>
-          </article>
-
-          <article>
-            <span>03</span>
-            <h3>Contact</h3>
-            <p>Message the seller or copy their Discord if that listing uses Discord contact.</p>
-          </article>
-        </div>
-      </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="container footer-wrap">
+        <div class="footer-brand">
+          <strong>Bokluy</strong>
+          <p>Top up, accounts, services, and digital products.</p>
+        </div>
+
+        <div class="footer-links">
+          <a href="./index.html">Marketplace</a>
+          <a href="./home.html">Home</a>
+          <a href="./auth.html">Login</a>
+        </div>
+
+        <div class="footer-contact">
+          <a href="https://t.me/Bokluyofficial" target="_blank" rel="noopener">Telegram</a>
+          <a href="https://wa.me/85512275265" target="_blank" rel="noopener">WhatsApp</a>
+          <a href="mailto:bokluyofficial@gmail.com">bokluyofficial@gmail.com</a>
+        </div>
+      </div>
+    </footer>
   </div>
 
   <dialog class="detail-modal" id="listingModal">
@@ -237,47 +237,43 @@
     </form>
   </dialog>
 
-  <div class="sell-modal" id="sellModal" aria-hidden="true">
-    <div class="sell-modal__backdrop" id="sellCloseBg"></div>
-
-    <div class="sell-modal__sheet" role="dialog" aria-modal="true" aria-labelledby="sellModalTitle">
-      <div class="sell-modal__head">
-        <h3 id="sellModalTitle">Seller Request</h3>
-        <button class="icon-btn" id="sellCloseBtn" type="button" aria-label="Close">×</button>
-      </div>
-
-      <form class="sell-modal__form" id="sellForm">
-        <label class="field">
-          <span>Phone</span>
-          <input id="sellPhone" type="text" required />
-        </label>
-
-        <label class="field">
-          <span>Game</span>
-          <input id="sellGame" type="text" required />
-        </label>
-
-        <label class="field">
-          <span>Item</span>
-          <input id="sellItem" type="text" required />
-        </label>
-
-        <label class="field">
-          <span>Price</span>
-          <input id="sellPrice" type="text" required />
-        </label>
-
-        <label class="field field-wide">
-          <span>Message</span>
-          <textarea id="sellMessage" rows="4" required></textarea>
-        </label>
-
-        <p class="form-feedback" id="sellStatus"></p>
-
-        <div class="composer-actions">
-          <button class="ghost-btn" id="sellCancel" type="button">Cancel</button>
-          <button class="primary-btn" type="submit">Send request</button>
+  <!-- Shared seller modal from the old site -->
+  <div aria-hidden="true" class="modal" id="sellModal">
+    <div class="modal-backdrop" id="sellCloseBg"></div>
+    <div aria-labelledby="sellTitle" aria-modal="true" class="modal-card" role="dialog">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title" id="sellTitle">ទម្រង់ស្នើលក់</div>
+          <div class="modal-sub">សូមបំពេញព័ត៌មានខាងក្រោម (តម្រូវអស់ទាំងអស់)</div>
         </div>
+        <button class="modal-x" id="sellCloseBtn" type="button">×</button>
+      </div>
+      <form class="modal-body" id="sellForm">
+        <label class="f">
+          <span class="l">លេខទូរស័ព្ទ Telegram</span>
+          <input class="i" id="sellPhone" placeholder="+855..." required type="tel" />
+        </label>
+        <label class="f">
+          <span class="l">ហ្គេម</span>
+          <input class="i" id="sellGame" placeholder="Growtopia / MLBB / ..." required type="text" />
+        </label>
+        <label class="f">
+          <span class="l">វត្ថុ / Item</span>
+          <input class="i" id="sellItem" placeholder="DL / BGL / Diamonds / ..." required type="text" />
+        </label>
+        <label class="f">
+          <span class="l">តម្លៃ USD</span>
+          <input class="i" id="sellPrice" placeholder="ex: 10" required type="text" />
+        </label>
+        <label class="f">
+          <span class="l">សារ / Message</span>
+          <textarea class="i t" id="sellMessage" placeholder="ពណ៌នាព័ត៌មានបន្ថែម..." required rows="4"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="sellCancel" type="button">បោះបង់</button>
+          <button class="btn-primary" type="submit">ផ្ញើសំណើ</button>
+        </div>
+        <div class="modal-note" id="sellStatus"></div>
       </form>
     </div>
   </div>
@@ -285,5 +281,6 @@
   <script src="./products/blox_fruits.js"></script>
   <script src="./products/anime_last_stand.js"></script>
   <script type="module" src="./indexO.js"></script>
+  <script type="module" src="./seller-modal.js"></script>
 </body>
 </html>
