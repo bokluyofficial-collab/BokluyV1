@@ -6709,11 +6709,7 @@ body.moon-home-page{
 }
 
 
-/* =========================================================
-   MOON HOME PAGE — FINAL OVERRIDES
-   Keep this block at the very end so earlier light-theme rules
-   cannot override the mobile home page.
-   ========================================================= */
+/* ============================================ */
 body.moon-home-page{
   min-height:100vh !important;
   background:
