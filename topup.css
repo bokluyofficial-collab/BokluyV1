@@ -717,7 +717,7 @@ body{
     border-radius: 14px;
   }
 
-  /* tighten text so it fits */
+  /* tighte text so it fits */
   :where(.mlbb-guide-text,.freefire-guide-text,.pubg-guide-text,.mcgg-guide-text,.hok-guide-text,.deltaforce-guide-text,.growtopia-guide-text){
     margin-top: 6px;
     line-height: 1.25;

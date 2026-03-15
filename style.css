@@ -6297,7 +6297,7 @@ main,
 
 #sellOpenBtn:active,
 .sell-btn:active{ transform: translateY(1px); }
-/* If Home + other buttons are in a container */
+/* If Home + othe butons are in a container */
 .header-actions,
 .nav-actions,
 .nav-right,
