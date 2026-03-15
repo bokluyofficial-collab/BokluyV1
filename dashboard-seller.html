@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bokluy Seller Dashboard</title>
+  <link rel="stylesheet" href="./dashboard.css" />
+</head>
+<body>
+  <div class="dashboard-shell">
+    <header class="site-header">
+      <div class="container nav-row">
+        <a class="brand" href="./home.html" aria-label="Bokluy home">
+          <img class="brand-logo" src="./images/logo.png" alt="Bokluy" />
+          <span class="brand-text">
+            <strong>Bokluy</strong>
+            <span>Seller Dashboard</span>
+          </span>
+        </a>
+
+        <div class="nav-actions">
+          <a class="ghost-btn" href="./index.html">Marketplace</a>
+          <a class="ghost-btn" href="./home.html">Home</a>
+          <button class="user-chip" id="userChip" type="button">
+            <span class="user-avatar" id="userAvatar">S</span>
+            <span class="user-name" id="userName">Seller</span>
+          </button>
+          <button class="ghost-btn" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrap">
+      <div class="container">
+        <section class="hero-card">
+          <span class="eyebrow">Seller center</span>
+          <h1>Manage your store and listings</h1>
+          <p>Select a game first, then choose the allowed category and product type for that game.</p>
+        </section>
+
+        <div class="status-card" id="statusCard">Loading seller dashboard...</div>
+
+        <section class="grid-3">
+          <article class="stat-card">
+            <div class="label">Store name</div>
+            <div class="value" id="storeNameStat">—</div>
+            <div class="hint">Your active seller profile</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="label">My listings</div>
+            <div class="value" id="listingCountStat">0</div>
+            <div class="hint">Current marketplace listings</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="label">Wallet balance</div>
+            <div class="value" id="walletStat">$0</div>
+            <div class="hint">Seller credits</div>
+          </article>
+        </section>
+
+        <div class="sections">
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Seller profile</h2>
+                <p>Your current approved seller account details.</p>
+              </div>
+              <button class="btn-secondary" id="refreshProfileBtn" type="button">Refresh</button>
+            </div>
+
+            <div class="info-list" id="sellerProfileInfo">
+              <div class="info-item">
+                <span class="k">Status</span>
+                <span class="v">Loading...</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Create listing</h2>
+                <p>For most games, only Accounts and Services are allowed. Growtopia and Roblox can also list Items.</p>
+              </div>
+            </div>
+
+            <form id="sellerListingForm">
+              <div class="form-grid">
+                <label class="field">
+                  <span>Game</span>
+                  <select id="listingGame" required>
+                    <option value="">Select game</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Category</span>
+                  <select id="listingCategory" required>
+                    <option value="">Select category</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Product / Type</span>
+                  <select id="listingItem" required>
+                    <option value="">Select item</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Type</span>
+                  <select id="listingType" required>
+                    <option value="SELLING">Selling</option>
+                    <option value="BUYING">Buying</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Price</span>
+                  <input id="listingPrice" type="number" min="0" step="0.01" placeholder="10" required />
+                </label>
+
+                <label class="field">
+                  <span>Quantity</span>
+                  <input id="listingQuantity" type="number" min="1" step="1" value="1" required />
+                </label>
+
+                <label class="field">
+                  <span>Status</span>
+                  <select id="listingStatus">
+                    <option value="active">Active</option>
+                    <option value="sold_out">Sold</option>
+                    <option value="paused">Paused</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Contact method</span>
+                  <select id="contactMethod">
+                    <option value="chat">In-app chat</option>
+                    <option value="discord">Discord</option>
+                  </select>
+                </label>
+
+                <label class="field" id="discordField" hidden>
+                  <span>Discord username</span>
+                  <input id="discordUsername" type="text" placeholder="user#1234" />
+                </label>
+
+                <label class="field" id="imageField" hidden>
+                  <span>Account image</span>
+                  <input id="listingImage" type="file" accept="image/*" />
+                </label>
+
+                <div class="field" id="imagePreviewWrap" hidden>
+                  <span>Preview</span>
+                  <img id="imagePreview" alt="Listing preview" style="width:160px;height:160px;object-fit:cover;border-radius:14px;border:1px solid var(--line);" />
+                </div>
+
+                <label class="field field-wide">
+                  <span>Notes</span>
+                  <textarea id="listingNotes" rows="4" placeholder="Extra information for buyers..."></textarea>
+                </label>
+              </div>
+
+              <div class="actions-row" style="margin-top:14px;">
+                <button class="btn" type="submit" id="saveListingBtn">Save listing</button>
+                <button class="btn-secondary" type="button" id="resetListingBtn">Reset</button>
+              </div>
+              <div style="margin-top:10px;color:var(--muted);" id="listingFormStatus"></div>
+            </form>
+          </section>
+
+          <section class="table-card">
+            <div class="section-head">
+              <div>
+                <h2>My listings</h2>
+                <p>Edit, mark sold, or delete the listings you created.</p>
+              </div>
+              <button class="btn-secondary" id="refreshListingsBtn" type="button">Refresh</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Game</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sellerListingsTableBody">
+                  <tr>
+                    <td colspan="7">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="footer-space"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="./dashboard-seller.js"></script>
+</body>
+</html>

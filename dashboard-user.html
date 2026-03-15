@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bokluy User Dashboard</title>
+  <link rel="stylesheet" href="./dashboard.css" />
+</head>
+<body>
+  <div class="dashboard-shell">
+    <header class="site-header">
+      <div class="container nav-row">
+        <a class="brand" href="./home.html" aria-label="Bokluy home">
+          <img class="brand-logo" src="./images/logo.png" alt="Bokluy" />
+          <span class="brand-text">
+            <strong>Bokluy</strong>
+            <span>User Dashboard</span>
+          </span>
+        </a>
+
+        <div class="nav-actions">
+          <a class="ghost-btn" href="./index.html">Marketplace</a>
+          <a class="ghost-btn" href="./home.html">Home</a>
+          <button class="user-chip" id="userChip" type="button">
+            <span class="user-avatar" id="userAvatar">U</span>
+            <span class="user-name" id="userName">User</span>
+          </button>
+          <button class="ghost-btn" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrap">
+      <div class="container">
+        <section class="hero-card">
+          <span class="eyebrow">Account</span>
+          <h1>Your Bokluy dashboard</h1>
+          <p>View your account info and seller application status.</p>
+        </section>
+
+        <div class="status-card" id="statusCard">Loading user dashboard...</div>
+
+        <section class="grid-3">
+          <article class="stat-card">
+            <div class="label">Account email</div>
+            <div class="value" id="emailStat">—</div>
+            <div class="hint">Your login email</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="label">Seller application</div>
+            <div class="value" id="applicationStat">—</div>
+            <div class="hint">Current seller request state</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="label">Role</div>
+            <div class="value" id="roleStat">User</div>
+            <div class="hint">Current account role</div>
+          </article>
+        </section>
+
+        <div class="sections">
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Profile</h2>
+                <p>Your current account information.</p>
+              </div>
+              <button class="btn-secondary" id="refreshProfileBtn" type="button">Refresh</button>
+            </div>
+
+            <div class="info-list" id="profileInfo">
+              <div class="info-item">
+                <span class="k">Loading</span>
+                <span class="v">...</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Seller application</h2>
+                <p>Check whether your seller request is pending, approved, or rejected.</p>
+              </div>
+              <a class="btn-secondary" href="./index.html">Go to Marketplace</a>
+            </div>
+
+            <div class="info-list" id="sellerApplicationInfo">
+              <div class="info-item">
+                <span class="k">Status</span>
+                <span class="v">Loading...</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Next actions</h2>
+                <p>Use these shortcuts to continue.</p>
+              </div>
+            </div>
+
+            <div class="actions-row">
+              <a class="btn" href="./index.html">Open Marketplace</a>
+              <a class="btn-secondary" href="./home.html">Go Home</a>
+              <a class="btn-secondary" href="./auth.html">Account Page</a>
+            </div>
+          </section>
+        </div>
+
+        <div class="footer-space"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="./dashboard-user.js"></script>
+</body>
+</html>

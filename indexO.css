@@ -866,3 +866,82 @@ img {
     padding: 16px 0 22px;
   }
 }
+.market-card__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.market-card__media.is-sold img,
+.market-card.is-sold .market-card__media img {
+  filter: brightness(0.45);
+}
+
+.sold-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #fff;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+select {
+  background-color: #facc15;
+  color: #111;
+  border: 1px solid #eab308;
+}
+
+select option {
+  background-color: #facc15;
+  color: #111;
+}
+select {
+  background-color: #facc15;
+  color: #111;
+  border: 2px solid #000;
+}
+
+select option {
+  background-color: #facc15;
+  color: #111;
+}
+select {
+  background-color: #facc15;
+  color: #111;
+  border: 2px solid #000 !important;
+  outline: none;
+  box-shadow: none;
+}
+
+select:focus {
+  border: 2px solid #000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+select option {
+  background-color: #facc15;
+  color: #111;
+}
+select {
+  background-color: #facc15;
+  color: #111;
+  border: 2px solid #000 !important;
+  outline: none;
+  box-shadow: none;
+}
+
+select:focus {
+  border: 2px solid #000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
+}
+
+select option {
+  background-color: #fff;
+  color: #111;
+}

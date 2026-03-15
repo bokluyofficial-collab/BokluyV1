@@ -1,7 +1,5 @@
 import { supabase } from "./supabase/supabaseClient.js";
 
-const OWNER_UID = "d7e7f252-321c-48b8-ba5c-e1c3ca12940c";
-
 const PRODUCT_CATALOG = [
   ...(window.bloxFruitsProducts || []),
   ...(window.animeLastStandProducts || []),
@@ -12,11 +10,16 @@ const FALLBACK_IMAGE = "./image.png";
 const GAME_PAGE_MAP = {
   mlbb: "./mlbb.html",
   hok: "./hok.html",
+  "honor of kings": "./hok.html",
   freefire: "./freefire.html",
+  "free fire": "./freefire.html",
   pubg: "./pubg.html",
+  "pubg mobile": "./pubg.html",
   growtopia: "./growtopia.html",
   deltaforce: "./deltaforce.html",
+  "delta force": "./deltaforce.html",
   bloodstrike: "./bloodstrike.html",
+  "blood strike": "./bloodstrike.html",
   roblox: "./roblox.html",
   mcgg: "./mcgg.html",
   genacc: "./home.html",
@@ -25,8 +28,8 @@ const GAME_PAGE_MAP = {
 
 const CATEGORY_GAME_MAP = {
   Item: null,
-  Accounts: "GenAcc",
-  Services: "GenSer",
+  Accounts: null,
+  Services: null,
   Robux: "Roblox",
 };
 
@@ -36,8 +39,9 @@ const state = {
   filtered: [],
   currentUserId: null,
   canManage: false,
-  editingId: null,
   activeCategory: "Item",
+  sellerProfile: null,
+  sellerApplication: null,
 };
 
 const els = {
@@ -58,8 +62,9 @@ const els = {
   userDropdown: document.getElementById("user-dropdown"),
   logoutBtn: document.getElementById("logout-btn"),
   openComposerBtn: document.getElementById("openComposerBtn"),
-  ownerOrdersLink: document.getElementById("ownerOrdersLink"),
   supportBtn: document.getElementById("supportBtn"),
+  sellOpenBtn: document.getElementById("sellOpenBtn"),
+  becomeSellerBtn: document.getElementById("becomeSellerBtn"),
 
   listingModal: document.getElementById("listingModal"),
   closeListingModal: document.getElementById("closeListingModal"),
@@ -70,21 +75,17 @@ const els = {
   detailNotes: document.getElementById("detailNotes"),
   detailActions: document.getElementById("detailActions"),
 
-  composerModal: document.getElementById("composerModal"),
-  composerTitle: document.getElementById("composerTitle"),
-  closeComposerBtn: document.getElementById("closeComposerBtn"),
-  cancelComposerBtn: document.getElementById("cancelComposerBtn"),
-  listingForm: document.getElementById("listingForm"),
-  listingGame: document.getElementById("listingGame"),
-  listingItem: document.getElementById("listingItem"),
-  listingType: document.getElementById("listingType"),
-  listingPrice: document.getElementById("listingPrice"),
-  listingQuantity: document.getElementById("listingQuantity"),
-  contactMethod: document.getElementById("contactMethod"),
-  discordField: document.getElementById("discordField"),
-  discordUsername: document.getElementById("discordUsername"),
-  listingNotes: document.getElementById("listingNotes"),
-  formFeedback: document.getElementById("formFeedback"),
+  sellModal: document.getElementById("sellModal"),
+  sellCloseBg: document.getElementById("sellCloseBg"),
+  sellCloseBtn: document.getElementById("sellCloseBtn"),
+  sellCancel: document.getElementById("sellCancel"),
+  sellForm: document.getElementById("sellForm"),
+  sellStatus: document.getElementById("sellStatus"),
+  sellStoreName: document.getElementById("sellStoreName"),
+  sellTelegram: document.getElementById("sellTelegram"),
+  sellWhatsapp: document.getElementById("sellWhatsapp"),
+  sellGames: document.getElementById("sellGames"),
+  sellNotes: document.getElementById("sellNotes"),
 };
 
 function escapeHtml(value) {
@@ -149,6 +150,10 @@ function setStatus(message, type = "info") {
   els.statusCard.className = `status-card is-visible${type === "error" ? " is-error" : ""}`;
 }
 
+function setSellStatus(message) {
+  if (els.sellStatus) els.sellStatus.textContent = message || "";
+}
+
 function productImageFor(game, item) {
   const match = PRODUCT_CATALOG.find((entry) => {
     return (
@@ -167,30 +172,36 @@ function getGamePagePath(game) {
 
 function detectStoreCategory(row) {
   const game = String(row?.game || "").trim().toLowerCase();
-
   if (game === "genacc") return "Accounts";
   if (game === "genser") return "Services";
   if (game === "roblox") return "Robux";
-
   return null;
 }
 
 function normalizeItemListing(row, sellerNameMap) {
+  const sellerId = row.seller_user_id || row.user_id;
+  const category = row.category || "Item";
+  const image = category === "Accounts"
+    ? (row.image_url || FALLBACK_IMAGE)
+    : productImageFor(row.game, row.item);
+
   return {
     id: row.id,
     source: "listing",
-    userId: row.user_id,
+    userId: sellerId,
+    category,
     game: row.game || "Unknown",
     item: row.item || "Untitled item",
     type: row.type || "SELLING",
     price: Number(row.price || 0),
     quantity: Number(row.quantity || 1),
+    status: row.status || "active",
     contactMethod: row.contact_method || "chat",
     discord: row.discord || "",
     notes: row.notes || "",
     createdAt: row.created_at,
-    sellerName: sellerNameMap.get(row.user_id) || "User",
-    image: productImageFor(row.game, row.item),
+    sellerName: sellerNameMap.get(sellerId) || "User",
+    image,
   };
 }
 
@@ -206,6 +217,7 @@ function normalizeStoreProduct(row) {
     type: "SELLING",
     price: Number(row.price || 0),
     quantity: 1,
+    status: "active",
     contactMethod: "page",
     discord: "",
     notes: row.description || row.notes || "Available from Bokluy store.",
@@ -217,39 +229,30 @@ function normalizeStoreProduct(row) {
   };
 }
 
-async function fetchDisplayNames(userIds) {
-  const uniqueIds = [...new Set(userIds.filter(Boolean))];
-  if (!uniqueIds.length) return new Map();
+async function getSellerProfile(userId) {
+  if (!userId) return null;
 
   const { data, error } = await supabase
-    .from("profiles_public")
-    .select("id, display_name")
-    .in("id", uniqueIds);
-
-  if (error) {
-    console.warn("Display names lookup failed:", error.message);
-    return new Map();
-  }
-
-  const map = new Map();
-  for (const row of data || []) {
-    map.set(row.id, row.display_name || "User");
-  }
-
-  return map;
-}
-
-async function canManageListings(session) {
-  if (!session?.user?.id) return false;
-  if (session.user.id === OWNER_UID) return true;
-
-  const { data, error } = await supabase
-    .from("admins")
-    .select("uid")
-    .eq("uid", session.user.id)
+    .from("seller_profiles")
+    .select("user_id, store_name, status")
+    .eq("user_id", userId)
     .maybeSingle();
 
-  return !error && !!data;
+  if (error || !data || data.status !== "active") return null;
+  return data;
+}
+
+async function getSellerApplication(userId) {
+  if (!userId) return null;
+
+  const { data, error } = await supabase
+    .from("seller_applications")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) return null;
+  return data || null;
 }
 
 function syncCategoryButtons() {
@@ -259,13 +262,22 @@ function syncCategoryButtons() {
   });
 
   if (els.openComposerBtn) {
-    els.openComposerBtn.hidden = !(state.canManage && state.activeCategory === "Item");
+    els.openComposerBtn.hidden = !state.canManage;
+    els.openComposerBtn.textContent = "Create Listing";
   }
 }
 
 function getActiveSourceRows() {
   if (state.activeCategory === "Item") {
-    return state.itemListings;
+    return state.itemListings.filter((row) => row.category === "Item");
+  }
+
+  if (state.activeCategory === "Accounts") {
+    return state.itemListings.filter((row) => row.category === "Accounts");
+  }
+
+  if (state.activeCategory === "Services") {
+    return state.itemListings.filter((row) => row.category === "Services");
   }
 
   const targetGame = CATEGORY_GAME_MAP[state.activeCategory];
@@ -273,7 +285,9 @@ function getActiveSourceRows() {
 }
 
 function fillGameFilter() {
-  const previous = els.gameFilter?.value || "all";
+  if (!els.gameFilter) return;
+
+  const previous = els.gameFilter.value || "all";
   const games = [...new Set(getActiveSourceRows().map((item) => item.game).filter(Boolean))].sort((a, b) =>
     a.localeCompare(b)
   );
@@ -290,10 +304,10 @@ function fillGameFilter() {
 
 function activeFilters() {
   return {
-    search: els.searchInput.value.trim().toLowerCase(),
-    game: els.gameFilter.value,
-    type: els.typeFilter.value,
-    sort: els.sortFilter.value,
+    search: els.searchInput?.value.trim().toLowerCase() || "",
+    game: els.gameFilter?.value || "all",
+    type: els.typeFilter?.value || "all",
+    sort: els.sortFilter?.value || "newest",
   };
 }
 
@@ -303,7 +317,7 @@ function applyFilters() {
 
   if (filters.search) {
     rows = rows.filter((item) =>
-      [item.item, item.game, item.sellerName, item.notes]
+      [item.item, item.game, item.sellerName, item.notes, item.category]
         .join(" ")
         .toLowerCase()
         .includes(filters.search)
@@ -314,7 +328,7 @@ function applyFilters() {
     rows = rows.filter((item) => item.game === filters.game);
   }
 
-  if (state.activeCategory === "Item" && filters.type !== "all") {
+  if (["Item", "Accounts", "Services"].includes(state.activeCategory) && filters.type !== "all") {
     rows = rows.filter((item) => item.type === filters.type);
   }
 
@@ -344,6 +358,8 @@ function applyFilters() {
 }
 
 function emptyCard(message) {
+  if (!els.listingsGrid) return;
+
   els.listingsGrid.innerHTML = `
     <article class="market-card">
       <div>
@@ -369,25 +385,30 @@ function detailField(label, value) {
 }
 
 function renderListings() {
+  if (!els.listingsGrid) return;
+
   const items = state.filtered;
   els.listingsGrid.innerHTML = "";
 
   if (!items.length) {
     const message =
-      state.activeCategory === "Item"
-        ? "No listed items match the current filters."
+      ["Item", "Accounts", "Services"].includes(state.activeCategory)
+        ? `No ${state.activeCategory.toLowerCase()} listings match the current filters.`
         : `No ${state.activeCategory.toLowerCase()} products match the current filters.`;
     emptyCard(message);
     return;
   }
 
   for (const item of items) {
+    const sold = item.status === "sold_out";
+
     const card = document.createElement("article");
-    card.className = "market-card";
+    card.className = `market-card${sold ? " is-sold" : ""}`;
 
     card.innerHTML = `
-      <div class="market-card__media">
+      <div class="market-card__media ${sold ? "is-sold" : ""}">
         <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.item)}" onerror="this.src='./image.png'" />
+        ${sold ? `<div class="sold-overlay">SOLD</div>` : ""}
       </div>
       <div>
         <div class="market-card__top">
@@ -395,7 +416,8 @@ function renderListings() {
             <div class="market-card__meta">
               <span class="market-pill ${item.type === "BUYING" ? "buying" : "selling"}">${escapeHtml(item.type)}</span>
               <span class="market-pill">${escapeHtml(displayGameName(item.game))}</span>
-              ${item.source === "store" ? `<span class="market-pill">${escapeHtml(state.activeCategory)}</span>` : ""}
+              <span class="market-pill">${escapeHtml(item.category || state.activeCategory)}</span>
+              ${sold ? `<span class="market-pill">Sold</span>` : ""}
             </div>
             <h3>${escapeHtml(item.item)}</h3>
           </div>
@@ -420,16 +442,11 @@ function renderListings() {
       actions.append(
         createActionButton("Open product", "success", () => openStoreProduct(item))
       );
-    } else {
+    } else if (!sold) {
       if (!state.currentUserId || state.currentUserId !== item.userId) {
         actions.append(
           createActionButton("Message seller", "success", () => messageSeller(item))
         );
-      }
-
-      if (state.canManage && state.currentUserId === item.userId) {
-        actions.append(createActionButton("Edit", "", () => openComposer(item)));
-        actions.append(createActionButton("Delete", "danger", () => deleteListing(item)));
       }
     }
 
@@ -438,15 +455,21 @@ function renderListings() {
 }
 
 function openListingModal(item) {
+  if (!els.listingModal) return;
+
+  const sold = item.status === "sold_out";
+
   els.detailTitle.textContent = item.item;
   els.detailImage.src = item.image || FALLBACK_IMAGE;
   els.detailImage.alt = `${item.item} image`;
+  els.detailImage.style.filter = sold ? "brightness(0.45)" : "";
 
   els.detailPills.innerHTML = `
     <span class="market-pill ${item.type === "BUYING" ? "buying" : "selling"}">${escapeHtml(item.type)}</span>
     <span class="market-pill">${escapeHtml(displayGameName(item.game))}</span>
     <span class="market-pill">${formatPrice(item.price)}</span>
-    ${item.source === "store" ? `<span class="market-pill">${escapeHtml(item.category || state.activeCategory)}</span>` : ""}
+    <span class="market-pill">${escapeHtml(item.category || state.activeCategory)}</span>
+    ${sold ? `<span class="market-pill">Sold</span>` : ""}
   `;
 
   if (item.source === "store") {
@@ -459,7 +482,9 @@ function openListingModal(item) {
   } else {
     els.detailGrid.innerHTML = [
       detailField("Seller", item.sellerName),
+      detailField("Category", item.category || "Item"),
       detailField("Quantity", String(item.quantity)),
+      detailField("Status", item.status || "active"),
       detailField(
         "Contact",
         item.contactMethod === "discord" ? `Discord: ${item.discord || "—"}` : "In-app chat"
@@ -475,105 +500,91 @@ function openListingModal(item) {
     els.detailActions.append(
       createActionButton("Open product page", "success", () => openStoreProduct(item))
     );
-  } else if (item.contactMethod === "discord" && item.discord) {
-    els.detailActions.append(
-      createActionButton("Copy Discord", "success", async () => {
-        try {
-          await navigator.clipboard.writeText(item.discord);
-          setStatus("Discord username copied.");
-        } catch {
-          setStatus("Clipboard access failed.", "error");
-        }
-      })
-    );
-  } else {
-    els.detailActions.append(
-      createActionButton("Message seller", "success", () => messageSeller(item))
-    );
-  }
-
-  if (item.source === "listing" && state.canManage && state.currentUserId === item.userId) {
-    els.detailActions.append(
-      createActionButton("Edit listing", "", () => {
-        closeListingModal();
-        openComposer(item);
-      })
-    );
+  } else if (!sold) {
+    if (item.contactMethod === "discord" && item.discord) {
+      els.detailActions.append(
+        createActionButton("Copy Discord", "success", async () => {
+          try {
+            await navigator.clipboard.writeText(item.discord);
+            setStatus("Discord username copied.");
+          } catch {
+            setStatus("Clipboard access failed.", "error");
+          }
+        })
+      );
+    } else {
+      els.detailActions.append(
+        createActionButton("Message seller", "success", () => messageSeller(item))
+      );
+    }
   }
 
   els.listingModal.showModal();
 }
 
 function closeListingModal() {
-  if (els.listingModal.open) els.listingModal.close();
+  if (els.listingModal?.open) els.listingModal.close();
 }
 
-function syncDiscordField() {
-  els.discordField.hidden = els.contactMethod.value !== "discord";
-}
-
-function resetComposer() {
-  state.editingId = null;
-  els.composerTitle.textContent = "Create listing";
-  els.listingForm.reset();
-  els.listingType.value = "SELLING";
-  els.listingQuantity.value = "1";
-  els.contactMethod.value = "chat";
-  els.formFeedback.textContent = "";
-  syncDiscordField();
-}
-
-function openComposer(item = null) {
-  if (state.activeCategory !== "Item") {
-    setStatus("Add listing is only for Item products. Accounts, Services, and Robux come from Supabase store products.", "error");
+function openSellerDashboard() {
+  if (!state.currentUserId) {
+    window.location.href = "./auth.html";
     return;
   }
 
-  if (!state.canManage) {
-    setStatus("Only the owner or an allowlisted admin can manage listings.", "error");
+  if (state.sellerProfile) {
+    window.location.href = "./dashboard-seller.html";
     return;
   }
 
-  resetComposer();
-
-  if (item) {
-    state.editingId = item.id;
-    els.composerTitle.textContent = "Edit listing";
-    els.listingGame.value = item.game;
-    els.listingItem.value = item.item;
-    els.listingType.value = item.type;
-    els.listingPrice.value = String(item.price);
-    els.listingQuantity.value = String(item.quantity);
-    els.contactMethod.value = item.contactMethod;
-    els.discordUsername.value = item.discord || "";
-    els.listingNotes.value = item.notes || "";
-    syncDiscordField();
+  if (state.sellerApplication?.status === "pending") {
+    setStatus("Your seller application is still pending review.");
+    return;
   }
 
-  els.composerModal.showModal();
+  if (!els.sellModal) return;
+  els.sellModal.setAttribute("aria-hidden", "false");
+  setSellStatus("");
 }
 
-function closeComposer() {
-  if (els.composerModal.open) els.composerModal.close();
+function closeSellModal() {
+  if (!els.sellModal) return;
+  els.sellModal.setAttribute("aria-hidden", "true");
+  setSellStatus("");
+  els.sellForm?.reset();
 }
 
 async function loadItemListings() {
   const { data, error } = await supabase
     .from("listings")
     .select("*")
+    .in("status", ["active", "sold_out", "paused"])
     .order("created_at", { ascending: false });
 
   if (error) throw error;
 
-  const sellerNames = await fetchDisplayNames((data || []).map((row) => row.user_id));
-  state.itemListings = (data || []).map((row) => normalizeItemListing(row, sellerNames));
+  const sellerIds = (data || []).map((row) => row.seller_user_id || row.user_id).filter(Boolean);
+
+  let sellerMap = new Map();
+  if (sellerIds.length) {
+    const { data: sellerRows, error: sellerError } = await supabase
+      .from("seller_profiles_public")
+      .select("user_id, store_name")
+      .in("user_id", [...new Set(sellerIds)]);
+
+    if (!sellerError) {
+      sellerMap = new Map((sellerRows || []).map((row) => [row.user_id, row.store_name]));
+    }
+  }
+
+  state.itemListings = (data || []).map((row) => normalizeItemListing(row, sellerMap));
 }
 
 async function loadStoreProducts() {
   const { data, error } = await supabase
     .from("topup_products")
     .select("*")
-    .in("game", ["GenAcc", "GenSer", "Roblox"])
+    .in("game", ["Roblox"])
     .eq("active", true);
 
   if (error) throw error;
@@ -629,6 +640,11 @@ async function messageSeller(item) {
     return;
   }
 
+  if (item.status === "sold_out") {
+    setStatus("This listing is already sold.", "error");
+    return;
+  }
+
   if (session.user.id === item.userId) {
     setStatus("You are the seller of this listing.", "error");
     return;
@@ -662,100 +678,21 @@ async function messageSeller(item) {
   closeListingModal();
 }
 
-async function saveListing(event) {
-  event.preventDefault();
-  els.formFeedback.textContent = "Saving...";
-
-  const { data } = await supabase.auth.getSession();
-  const session = data.session;
-
-  if (!session?.user?.id || !state.canManage) {
-    els.formFeedback.textContent = "You do not have permission to manage listings.";
-    return;
-  }
-
-  const payload = {
-    user_id: session.user.id,
-    game: els.listingGame.value.trim(),
-    item: els.listingItem.value.trim(),
-    type: els.listingType.value,
-    price: Number(els.listingPrice.value),
-    quantity: Number(els.listingQuantity.value),
-    contact_method: els.contactMethod.value,
-    discord: els.contactMethod.value === "discord" ? els.discordUsername.value.trim() || null : null,
-    notes: els.listingNotes.value.trim() || null,
-  };
-
-  if (!payload.game || !payload.item || !Number.isFinite(payload.price) || payload.price < 0) {
-    els.formFeedback.textContent = "Fill in the required fields correctly.";
-    return;
-  }
-
-  let error;
-
-  if (state.editingId) {
-    const updatePayload = { ...payload };
-    delete updatePayload.user_id;
-
-    ({ error } = await supabase
-      .from("listings")
-      .update(updatePayload)
-      .eq("id", state.editingId)
-      .eq("user_id", session.user.id));
-  } else {
-    ({ error } = await supabase.from("listings").insert(payload));
-  }
-
-  if (error) {
-    els.formFeedback.textContent = error.message;
-    return;
-  }
-
-  els.formFeedback.textContent = state.editingId ? "Listing updated." : "Listing created.";
-  await loadItemListings();
-  fillGameFilter();
-  applyFilters();
-
-  setTimeout(() => {
-    closeComposer();
-    resetComposer();
-  }, 350);
-}
-
-async function deleteListing(item) {
-  const confirmed = window.confirm(`Delete "${item.item}"?`);
-  if (!confirmed) return;
-
-  const { data } = await supabase.auth.getSession();
-  const session = data.session;
-  if (!session?.user?.id) return;
-
-  const { error } = await supabase
-    .from("listings")
-    .delete()
-    .eq("id", item.id)
-    .eq("user_id", session.user.id);
-
-  if (error) {
-    setStatus(error.message, "error");
-    return;
-  }
-
-  setStatus("Listing deleted.");
-  await loadItemListings();
-  fillGameFilter();
-  applyFilters();
-}
-
 function setAuthUI(session) {
   const user = session?.user;
   state.currentUserId = user?.id || null;
 
   if (!user) {
-    els.loginLink.hidden = false;
-    els.userMenu.hidden = true;
-    els.openComposerBtn.hidden = true;
-    els.ownerOrdersLink.hidden = true;
+    if (els.loginLink) els.loginLink.hidden = false;
+    if (els.userMenu) els.userMenu.hidden = true;
+    if (els.openComposerBtn) els.openComposerBtn.hidden = true;
+
+    if (els.sellOpenBtn) {
+      els.sellOpenBtn.hidden = false;
+      els.sellOpenBtn.textContent = "Become a Seller";
+    }
+
+    if (els.becomeSellerBtn) els.becomeSellerBtn.hidden = false;
     return;
   }
 
@@ -765,62 +702,147 @@ function setAuthUI(session) {
     user.email ||
     "User";
 
-  els.loginLink.hidden = true;
-  els.userMenu.hidden = false;
-  els.userName.textContent = displayName;
-  els.userAvatar.textContent = String(displayName).trim().charAt(0).toUpperCase();
-  els.openComposerBtn.hidden = !(state.canManage && state.activeCategory === "Item");
-  els.ownerOrdersLink.hidden = user.id !== OWNER_UID;
+  if (els.loginLink) els.loginLink.hidden = true;
+  if (els.userMenu) els.userMenu.hidden = false;
+  if (els.userName) els.userName.textContent = displayName;
+  if (els.userAvatar) els.userAvatar.textContent = String(displayName).trim().charAt(0).toUpperCase();
+
+  if (els.openComposerBtn) {
+    els.openComposerBtn.hidden = !state.canManage;
+    els.openComposerBtn.textContent = "Create Listing";
+  }
+
+  if (state.sellerProfile) {
+    if (els.sellOpenBtn) {
+      els.sellOpenBtn.hidden = false;
+      els.sellOpenBtn.textContent = "Create Listing";
+    }
+    if (els.becomeSellerBtn) els.becomeSellerBtn.hidden = true;
+  } else if (state.sellerApplication?.status === "pending") {
+    if (els.sellOpenBtn) {
+      els.sellOpenBtn.hidden = false;
+      els.sellOpenBtn.textContent = "Seller Pending";
+    }
+    if (els.becomeSellerBtn) els.becomeSellerBtn.hidden = true;
+  } else {
+    if (els.sellOpenBtn) {
+      els.sellOpenBtn.hidden = false;
+      els.sellOpenBtn.textContent = "Become a Seller";
+    }
+    if (els.becomeSellerBtn) els.becomeSellerBtn.hidden = false;
+  }
 }
 
 function closeUserDropdown() {
-  els.userDropdown.hidden = true;
-  els.userChip?.setAttribute("aria-expanded", "false");
+  if (els.userDropdown) els.userDropdown.hidden = true;
+  if (els.userChip) els.userChip.setAttribute("aria-expanded", "false");
 }
 
 async function initializeAuth() {
   const { data } = await supabase.auth.getSession();
-  state.canManage = await canManageListings(data.session);
-  setAuthUI(data.session);
+  const session = data.session;
+  const userId = session?.user?.id || null;
 
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    state.canManage = await canManageListings(session);
-    setAuthUI(session);
+  state.sellerProfile = await getSellerProfile(userId);
+  state.sellerApplication = await getSellerApplication(userId);
+  state.canManage = !!state.sellerProfile;
+  setAuthUI(session);
+
+  supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+    const nextUserId = nextSession?.user?.id || null;
+    state.sellerProfile = await getSellerProfile(nextUserId);
+    state.sellerApplication = await getSellerApplication(nextUserId);
+    state.canManage = !!state.sellerProfile;
+    setAuthUI(nextSession);
     applyFilters();
   });
 }
 
+async function submitSellerApplication(event) {
+  event.preventDefault();
+
+  const { data } = await supabase.auth.getSession();
+  const session = data.session;
+
+  if (!session?.user?.id) {
+    window.location.href = "./auth.html";
+    return;
+  }
+
+  const games = els.sellGames.value
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  const payload = {
+    user_id: session.user.id,
+    display_name: els.sellStoreName.value.trim(),
+    contact_telegram: els.sellTelegram.value.trim() || null,
+    contact_whatsapp: els.sellWhatsapp.value.trim() || null,
+    games,
+    notes: els.sellNotes.value.trim() || null,
+    status: "pending",
+  };
+
+  if (!payload.display_name || games.length === 0) {
+    setSellStatus("Store name and games are required.");
+    return;
+  }
+
+  setSellStatus("Submitting application...");
+
+  const { error } = await supabase
+    .from("seller_applications")
+    .upsert(payload, { onConflict: "user_id" });
+
+  if (error) {
+    console.error("seller application error:", error);
+    setSellStatus(error.message || "Failed to submit application.");
+    return;
+  }
+
+  state.sellerApplication = payload;
+  setSellStatus("Application submitted.");
+  setStatus("Seller application submitted. Wait for approval.");
+  setAuthUI(session);
+
+  setTimeout(() => {
+    closeSellModal();
+  }, 500);
+}
+
 function bindEvents() {
-  els.searchInput.addEventListener("input", applyFilters);
-  els.gameFilter.addEventListener("change", applyFilters);
-  els.typeFilter.addEventListener("change", applyFilters);
-  els.sortFilter.addEventListener("change", applyFilters);
+  els.searchInput?.addEventListener("input", applyFilters);
+  els.gameFilter?.addEventListener("change", applyFilters);
+  els.typeFilter?.addEventListener("change", applyFilters);
+  els.sortFilter?.addEventListener("change", applyFilters);
 
   els.categorySwitch?.addEventListener("click", (event) => {
     const btn = event.target.closest(".category-btn");
     if (!btn) return;
 
     state.activeCategory = btn.dataset.category || "Item";
-    els.typeFilter.value = "all";
+
+    if (els.typeFilter) els.typeFilter.value = "all";
     fillGameFilter();
     applyFilters();
     closeUserDropdown();
   });
 
-  els.resetFiltersBtn.addEventListener("click", () => {
-    els.searchInput.value = "";
-    els.gameFilter.value = "all";
-    els.typeFilter.value = "all";
-    els.sortFilter.value = "newest";
+  els.resetFiltersBtn?.addEventListener("click", () => {
+    if (els.searchInput) els.searchInput.value = "";
+    if (els.gameFilter) els.gameFilter.value = "all";
+    if (els.typeFilter) els.typeFilter.value = "all";
+    if (els.sortFilter) els.sortFilter.value = "newest";
     applyFilters();
   });
 
   els.userChip?.addEventListener("click", (event) => {
     event.stopPropagation();
-    const willOpen = els.userDropdown.hidden;
+    const willOpen = els.userDropdown?.hidden;
     closeUserDropdown();
-    els.userDropdown.hidden = !willOpen;
-    els.userChip.setAttribute("aria-expanded", String(willOpen));
+    if (els.userDropdown) els.userDropdown.hidden = !willOpen;
+    if (els.userChip) els.userChip.setAttribute("aria-expanded", String(willOpen));
   });
 
   document.addEventListener("click", closeUserDropdown);
@@ -837,8 +859,19 @@ function bindEvents() {
 
   els.openComposerBtn?.addEventListener("click", () => {
     closeUserDropdown();
-    openComposer();
+    openSellerDashboard();
   });
+
+  els.sellOpenBtn?.addEventListener("click", () => {
+    closeUserDropdown();
+    openSellerDashboard();
+  });
+
+  els.becomeSellerBtn?.addEventListener("click", openSellerDashboard);
+  els.sellCloseBg?.addEventListener("click", closeSellModal);
+  els.sellCloseBtn?.addEventListener("click", closeSellModal);
+  els.sellCancel?.addEventListener("click", closeSellModal);
+  els.sellForm?.addEventListener("submit", submitSellerApplication);
 
   els.closeListingModal?.addEventListener("click", closeListingModal);
 
@@ -846,21 +879,9 @@ function bindEvents() {
     const box = els.listingModal.querySelector(".detail-modal__content");
     if (box && !box.contains(event.target)) closeListingModal();
   });
-
-  els.closeComposerBtn?.addEventListener("click", closeComposer);
-
-  els.cancelComposerBtn?.addEventListener("click", () => {
-    closeComposer();
-    resetComposer();
-  });
-
-  els.composerModal?.addEventListener("close", resetComposer);
-  els.contactMethod?.addEventListener("change", syncDiscordField);
-  els.listingForm?.addEventListener("submit", saveListing);
 }
 
 async function init() {
-  syncDiscordField();
   bindEvents();
   await initializeAuth();
   await loadEverything();

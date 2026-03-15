@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bokluy Admin Dashboard</title>
+  <link rel="stylesheet" href="./dashboard.css" />
+</head>
+<body>
+  <div class="dashboard-shell">
+    <header class="site-header">
+      <div class="container nav-row">
+        <a class="brand" href="./home.html" aria-label="Bokluy home">
+          <img class="brand-logo" src="./images/logo.png" alt="Bokluy" />
+          <span class="brand-text">
+            <strong>Bokluy</strong>
+            <span>Admin Dashboard</span>
+          </span>
+        </a>
+
+        <div class="nav-actions">
+          <a class="ghost-btn" href="./index.html">Marketplace</a>
+          <a class="ghost-btn" href="./home.html">Home</a>
+          <button class="user-chip" id="userChip" type="button">
+            <span class="user-avatar" id="userAvatar">A</span>
+            <span class="user-name" id="userName">Admin</span>
+          </button>
+          <button class="ghost-btn" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrap">
+      <div class="container">
+        <section class="hero-card">
+          <span class="eyebrow">Admin control</span>
+          <h1>Seller applications and marketplace admin</h1>
+          <p>Approve or reject seller requests and monitor current seller status.</p>
+        </section>
+
+        <div class="status-card" id="statusCard">Loading admin dashboard...</div>
+
+        <section class="grid-3">
+          <article class="stat-card">
+            <div class="label">Pending applications</div>
+            <div class="value" id="pendingCount">0</div>
+            <div class="hint">Waiting for review</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="label">Approved sellers</div>
+            <div class="value" id="approvedCount">0</div>
+            <div class="hint">Active seller profiles</div>
+          </article>
+
+          <article class="stat-card">
+            <div class="label">Rejected applications</div>
+            <div class="value" id="rejectedCount">0</div>
+            <div class="hint">Applications not approved</div>
+          </article>
+        </section>
+
+        <div class="sections">
+          <section class="table-card">
+            <div class="section-head">
+              <div>
+                <h2>Seller applications</h2>
+                <p>Review pending, approved, and rejected requests.</p>
+              </div>
+              <button class="btn-secondary" id="refreshApplicationsBtn" type="button">Refresh</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Store</th>
+                    <th>Contact</th>
+                    <th>Games</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                  <tr>
+                    <td colspan="6">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="table-card">
+            <div class="section-head">
+              <div>
+                <h2>Seller profiles</h2>
+                <p>Current approved sellers and account status.</p>
+              </div>
+              <button class="btn-secondary" id="refreshProfilesBtn" type="button">Refresh</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Store</th>
+                    <th>User ID</th>
+                    <th>Status</th>
+                    <th>Wallet</th>
+                    <th>Total sales</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="profilesTableBody">
+                  <tr>
+                    <td colspan="6">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="footer-space"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="./dashboard-admin.js"></script>
+</body>
+</html>

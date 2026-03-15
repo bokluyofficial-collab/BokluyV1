@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bokluy Marketplace</title>
   <link rel="icon" type="image/png" sizes="32x32" href="./images/logo21.png">
-<link rel="icon" type="image/png" sizes="16x16" href="./images/logo21.png">
-<link rel="shortcut icon" href="./images/logo21.png" type="image/png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/logo21.png">
+  <link rel="shortcut icon" href="./images/logo21.png" type="image/png">
   <meta
     name="description"
     content="Bokluy marketplace for buying and selling digital game items."
@@ -22,17 +22,15 @@
           <img class="brand-logo" src="./images/logo.png" alt="Bokluy" />
           <span class="brand-text">
             <strong>Bokluy</strong>
-            
           </span>
         </a>
 
         <nav class="nav-links" aria-label="Primary">
           <a href="./home.html">Home</a>
-          
         </nav>
 
         <div class="nav-actions">
-          <button class="ghost-btn sell-btn" id="sellOpenBtn" type="button">លក់</button>
+          <button class="ghost-btn sell-btn" id="sellOpenBtn" type="button">Become a Seller</button>
           <button class="ghost-btn" id="supportBtn" type="button">Help</button>
           <a class="ghost-btn" id="login-link" href="./auth.html">Login</a>
 
@@ -45,7 +43,6 @@
             <div class="user-dropdown" id="user-dropdown" hidden>
               <a href="./dashboard.html">Dashboard</a>
               <button id="openComposerBtn" type="button" hidden>Create listing</button>
-              <a href="./owner_orders.html" id="ownerOrdersLink" hidden>Owner orders</a>
               <button id="logout-btn" type="button">Logout</button>
             </div>
           </div>
@@ -62,7 +59,11 @@
                 <span class="eyebrow">Browse marketplace</span>
                 <h2>Listings</h2>
               </div>
-              <button class="ghost-btn" id="resetFiltersBtn" type="button">Reset</button>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="ghost-btn sell-btn" id="becomeSellerBtn" type="button">Become a Seller</button>
+                <button class="ghost-btn" id="resetFiltersBtn" type="button">Reset</button>
+              </div>
             </div>
 
             <div class="filters-grid">
@@ -174,7 +175,7 @@
     <form class="composer-card" id="listingForm" method="dialog">
       <div class="composer-head">
         <div>
-          <p class="eyebrow">Owner tools</p>
+          <p class="eyebrow">Seller tools</p>
           <h3 id="composerTitle">Create listing</h3>
         </div>
         <button class="icon-btn" id="closeComposerBtn" type="button" aria-label="Close">×</button>
@@ -240,41 +241,40 @@
     </form>
   </dialog>
 
-  <!-- Shared seller modal from the old site -->
   <div aria-hidden="true" class="modal" id="sellModal">
     <div class="modal-backdrop" id="sellCloseBg"></div>
     <div aria-labelledby="sellTitle" aria-modal="true" class="modal-card" role="dialog">
       <div class="modal-head">
         <div>
-          <div class="modal-title" id="sellTitle">ទម្រង់ស្នើលក់</div>
-          <div class="modal-sub">សូមបំពេញព័ត៌មានខាងក្រោម (តម្រូវអស់ទាំងអស់)</div>
+          <div class="modal-title" id="sellTitle">Become a Seller</div>
+          <div class="modal-sub">Submit your application to sell items on Bokluy.</div>
         </div>
         <button class="modal-x" id="sellCloseBtn" type="button">×</button>
       </div>
       <form class="modal-body" id="sellForm">
         <label class="f">
-          <span class="l">លេខទូរស័ព្ទ Telegram</span>
-          <input class="i" id="sellPhone" placeholder="+855..." required type="tel" />
+          <span class="l">Store name</span>
+          <input class="i" id="sellStoreName" placeholder="Your store or nickname" required type="text" />
         </label>
         <label class="f">
-          <span class="l">ហ្គេម</span>
-          <input class="i" id="sellGame" placeholder="Growtopia / MLBB / ..." required type="text" />
+          <span class="l">Telegram</span>
+          <input class="i" id="sellTelegram" placeholder="@username" type="text" />
         </label>
         <label class="f">
-          <span class="l">វត្ថុ / Item</span>
-          <input class="i" id="sellItem" placeholder="DL / BGL / Diamonds / ..." required type="text" />
+          <span class="l">WhatsApp</span>
+          <input class="i" id="sellWhatsapp" placeholder="+855..." type="text" />
         </label>
         <label class="f">
-          <span class="l">តម្លៃ USD</span>
-          <input class="i" id="sellPrice" placeholder="ex: 10" required type="text" />
+          <span class="l">Games you sell</span>
+          <input class="i" id="sellGames" placeholder="MLBB, Growtopia, Blox Fruits" required type="text" />
         </label>
         <label class="f">
-          <span class="l">សារ / Message</span>
-          <textarea class="i t" id="sellMessage" placeholder="ពណ៌នាព័ត៌មានបន្ថែម..." required rows="4"></textarea>
+          <span class="l">Notes</span>
+          <textarea class="i t" id="sellNotes" placeholder="Tell Bokluy what you sell..." rows="4"></textarea>
         </label>
         <div class="modal-actions">
-          <button class="btn-secondary" id="sellCancel" type="button">បោះបង់</button>
-          <button class="btn-primary" type="submit">ផ្ញើសំណើ</button>
+          <button class="btn-secondary" id="sellCancel" type="button">Cancel</button>
+          <button class="btn-primary" type="submit">Submit Application</button>
         </div>
         <div class="modal-note" id="sellStatus"></div>
       </form>
@@ -284,6 +284,5 @@
   <script src="./products/blox_fruits.js"></script>
   <script src="./products/anime_last_stand.js"></script>
   <script type="module" src="./indexO.js"></script>
-  <script type="module" src="./seller-modal.js"></script>
 </body>
 </html>
