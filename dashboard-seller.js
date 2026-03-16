@@ -45,6 +45,10 @@ const state = {
   session: null,
   sellerProfile: null,
   listings: [],
+  orders: [],
+  ledger: [],
+  catalog: [],
+  owned: [],
   editingId: null,
   editingImageUrl: null,
 };
@@ -56,14 +60,22 @@ const els = {
   logoutBtn: document.getElementById("logoutBtn"),
 
   storeNameStat: document.getElementById("storeNameStat"),
-  listingCountStat: document.getElementById("listingCountStat"),
   walletStat: document.getElementById("walletStat"),
+  verifiedStat: document.getElementById("verifiedStat"),
 
   refreshProfileBtn: document.getElementById("refreshProfileBtn"),
   refreshListingsBtn: document.getElementById("refreshListingsBtn"),
+  refreshOrdersBtn: document.getElementById("refreshOrdersBtn"),
+  refreshLedgerBtn: document.getElementById("refreshLedgerBtn"),
+  refreshShopBtn: document.getElementById("refreshShopBtn"),
+  refreshOwnedBtn: document.getElementById("refreshOwnedBtn"),
 
   sellerProfileInfo: document.getElementById("sellerProfileInfo"),
   sellerListingsTableBody: document.getElementById("sellerListingsTableBody"),
+  sellerOrdersTableBody: document.getElementById("sellerOrdersTableBody"),
+  ledgerTableBody: document.getElementById("ledgerTableBody"),
+  shopGrid: document.getElementById("shopGrid"),
+  activeCosmeticsInfo: document.getElementById("activeCosmeticsInfo"),
 
   sellerListingForm: document.getElementById("sellerListingForm"),
   listingGame: document.getElementById("listingGame"),
@@ -87,7 +99,6 @@ const els = {
 };
 
 function setStatus(message, isError = false) {
-  if (!els.statusCard) return;
   els.statusCard.textContent = message;
   els.statusCard.className = `status-card${isError ? " is-error" : ""}`;
 }
@@ -102,8 +113,11 @@ function escapeHtml(value) {
 }
 
 function formatMoney(value) {
-  const n = Number(value || 0);
-  return `$${n.toLocaleString()}`;
+  return `$${Number(value || 0).toLocaleString()}`;
+}
+
+function formatBCoins(value) {
+  return `${Number(value || 0).toLocaleString()} B Coins`;
 }
 
 function formatDate(value) {
@@ -115,14 +129,13 @@ function formatDate(value) {
 
 function badgeClass(status) {
   const s = String(status || "").toLowerCase();
-  if (s === "active" || s === "approved") return "badge active";
-  if (s === "suspended" || s === "rejected" || s === "deleted" || s === "sold_out") return "badge suspended";
-  if (s === "pending" || s === "paused") return "badge pending";
+  if (s === "active" || s === "approved" || s === "admin_completed") return "badge approved";
+  if (s === "suspended" || s === "rejected" || s === "deleted" || s === "sold_out" || s === "help_requested") return "badge rejected";
+  if (s === "pending" || s === "paused" || s === "paid" || s === "delivered" || s === "buyer_completed") return "badge pending";
   return "badge";
 }
 
 function setFormStatus(message, isError = false) {
-  if (!els.listingFormStatus) return;
   els.listingFormStatus.textContent = message || "";
   els.listingFormStatus.style.color = isError ? "#fecaca" : "var(--muted)";
 }
@@ -138,7 +151,6 @@ function clearImagePreview() {
 
 function syncImageField() {
   const isAccount = els.listingCategory.value === "Accounts";
-
   els.imageField.hidden = !isAccount;
 
   if (!isAccount) {
@@ -162,12 +174,10 @@ function populateGames() {
 function populateCategories() {
   const game = els.listingGame.value;
   const categories = game ? Object.keys(LISTING_OPTIONS[game] || {}) : [];
-
   els.listingCategory.innerHTML = `
     <option value="">Select category</option>
     ${categories.map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("")}
   `;
-
   els.listingItem.innerHTML = `<option value="">Select item</option>`;
   syncImageField();
 }
@@ -199,6 +209,16 @@ function resetForm() {
   syncDiscordField();
   clearImagePreview();
   syncImageField();
+}
+
+function setTab(tab) {
+  document.querySelectorAll(".dashboard-tab-btn").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.tab === tab);
+  });
+
+  document.getElementById("tab-listings").hidden = tab !== "listings";
+  document.getElementById("tab-orders").hidden = tab !== "orders";
+  document.getElementById("tab-shop").hidden = tab !== "shop";
 }
 
 async function requireSeller() {
@@ -271,76 +291,197 @@ async function loadSellerListings() {
   state.listings = data || [];
 }
 
+async function loadSellerOrders() {
+  const { data, error } = await supabase
+    .from("marketplace_orders")
+    .select("*")
+    .eq("seller_user_id", state.session.user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  state.orders = data || [];
+}
+
+async function loadLedger() {
+  const { data, error } = await supabase
+    .from("seller_wallet_ledger")
+    .select("*")
+    .eq("seller_user_id", state.session.user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  state.ledger = data || [];
+}
+
+async function loadCatalog() {
+  const { data, error } = await supabase
+    .from("seller_cosmetics_catalog")
+    .select("*")
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  state.catalog = data || [];
+}
+
+async function loadOwned() {
+  const { data, error } = await supabase
+    .from("seller_owned_cosmetics")
+    .select("id, cosmetic_id, purchased_at")
+    .eq("seller_user_id", state.session.user.id)
+    .order("purchased_at", { ascending: false });
+
+  if (error) throw error;
+  state.owned = data || [];
+}
+
 function renderProfile() {
   const sp = state.sellerProfile;
-  if (!sp) return;
-
   els.storeNameStat.textContent = sp.store_name || "—";
-  els.walletStat.textContent = formatMoney(sp.wallet_balance);
+  els.walletStat.textContent = formatBCoins(sp.bcoin_balance);
+  els.verifiedStat.innerHTML = sp.is_verified ? `Yes <span class="verified-badge">✓</span>` : "No";
+
   els.sellerProfileInfo.innerHTML = `
     <div class="info-item">
       <span class="k">Store name</span>
-      <span class="v">${escapeHtml(sp.store_name || "—")}</span>
+      <span class="v">${escapeHtml(sp.store_name || "—")}${sp.is_verified ? ` <span class="verified-badge">✓</span>` : ""}</span>
     </div>
     <div class="info-item">
       <span class="k">Status</span>
       <span class="v"><span class="${badgeClass(sp.status)}">${escapeHtml(sp.status)}</span></span>
     </div>
     <div class="info-item">
-      <span class="k">Wallet balance</span>
-      <span class="v">${escapeHtml(formatMoney(sp.wallet_balance))}</span>
+      <span class="k">B Coin balance</span>
+      <span class="v">${escapeHtml(formatBCoins(sp.bcoin_balance))}</span>
     </div>
     <div class="info-item">
-      <span class="k">Total sales</span>
-      <span class="v">${escapeHtml(formatMoney(sp.total_sales))}</span>
+      <span class="k">Lifetime earned</span>
+      <span class="v">${escapeHtml(formatBCoins(sp.lifetime_bcoin_earned))}</span>
     </div>
     <div class="info-item">
-      <span class="k">Total withdrawn</span>
-      <span class="v">${escapeHtml(formatMoney(sp.total_withdrawn))}</span>
+      <span class="k">Active name style</span>
+      <span class="v">${escapeHtml(sp.active_name_style || "Default")}</span>
     </div>
     <div class="info-item">
-      <span class="k">Created</span>
-      <span class="v">${escapeHtml(formatDate(sp.created_at))}</span>
+      <span class="k">Active profile style</span>
+      <span class="v">${escapeHtml(sp.active_profile_style || "Default")}</span>
     </div>
+    <div class="info-item">
+      <span class="k">Active card style</span>
+      <span class="v">${escapeHtml(sp.active_card_style || "Default")}</span>
+    </div>
+    <div class="info-item">
+      <span class="k">Active badge style</span>
+      <span class="v">${escapeHtml(sp.active_badge_style || "Default")}</span>
+    </div>
+  `;
+
+  els.activeCosmeticsInfo.innerHTML = `
+    <div class="info-item"><span class="k">Profile style</span><span class="v">${escapeHtml(sp.active_profile_style || "Default")}</span></div>
+    <div class="info-item"><span class="k">Name style</span><span class="v">${escapeHtml(sp.active_name_style || "Default")}</span></div>
+    <div class="info-item"><span class="k">Card style</span><span class="v">${escapeHtml(sp.active_card_style || "Default")}</span></div>
+    <div class="info-item"><span class="k">Badge style</span><span class="v">${escapeHtml(sp.active_badge_style || "Default")}</span></div>
   `;
 }
 
 function renderListings() {
-  els.listingCountStat.textContent = String(state.listings.length);
-
   if (!state.listings.length) {
-    els.sellerListingsTableBody.innerHTML = `
-      <tr>
-        <td colspan="7">
-          <div class="empty-state">You have no listings yet.</div>
-        </td>
-      </tr>
-    `;
+    els.sellerListingsTableBody.innerHTML = `<tr><td colspan="7"><div class="empty-state">You have no listings yet.</div></td></tr>`;
     return;
   }
 
-  els.sellerListingsTableBody.innerHTML = state.listings
-    .map((row) => `
+  els.sellerListingsTableBody.innerHTML = state.listings.map((row) => `
+    <tr>
+      <td>
+        <strong>${escapeHtml(row.item || "Untitled")}</strong>
+        ${row.image_url ? `<div style="margin-top:8px;"><img src="${escapeHtml(row.image_url)}" alt="listing" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line);" /></div>` : ""}
+      </td>
+      <td>${escapeHtml(row.category || "Item")}</td>
+      <td>${escapeHtml(row.game || "—")}</td>
+      <td>${escapeHtml(formatMoney(row.price))}</td>
+      <td>${escapeHtml(String(row.quantity || 0))}</td>
+      <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status || "active")}</span></td>
+      <td>
+        <div class="actions-row">
+          <button class="btn-secondary" type="button" data-action="edit" data-id="${escapeHtml(row.id)}">Edit</button>
+          <button class="btn-secondary" type="button" data-action="sold" data-id="${escapeHtml(row.id)}">Mark Sold</button>
+          <button class="btn-danger" type="button" data-action="delete" data-id="${escapeHtml(row.id)}">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function renderOrders() {
+  if (!state.orders.length) {
+    els.sellerOrdersTableBody.innerHTML = `<tr><td colspan="6"><div class="empty-state">No seller orders yet.</div></td></tr>`;
+    return;
+  }
+
+  els.sellerOrdersTableBody.innerHTML = state.orders.map((row) => {
+    const canDeliver = ["paid", "help_requested"].includes(row.status);
+
+    return `
       <tr>
-        <td>
-          <strong>${escapeHtml(row.item || "Untitled")}</strong>
-          ${row.image_url ? `<div style="margin-top:8px;"><img src="${escapeHtml(row.image_url)}" alt="listing" style="width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line);" /></div>` : ""}
-        </td>
-        <td>${escapeHtml(row.category || "Item")}</td>
-        <td>${escapeHtml(row.game || "—")}</td>
-        <td>${escapeHtml(formatMoney(row.price))}</td>
-        <td>${escapeHtml(String(row.quantity || 0))}</td>
-        <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status || "active")}</span></td>
+        <td>${escapeHtml(row.listing_snapshot_title || "Order")}</td>
+        <td>${escapeHtml(String(row.buyer_user_id).slice(0, 12))}</td>
+        <td>${escapeHtml(formatMoney(row.total_price_usd))}</td>
+        <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status)}</span></td>
+        <td>${escapeHtml(formatBCoins(row.reward_bcoins || 0))}</td>
         <td>
           <div class="actions-row">
-            <button class="btn-secondary" type="button" data-action="edit" data-id="${escapeHtml(row.id)}">Edit</button>
-            <button class="btn-secondary" type="button" data-action="sold" data-id="${escapeHtml(row.id)}">Mark Sold</button>
-            <button class="btn-danger" type="button" data-action="delete" data-id="${escapeHtml(row.id)}">Delete</button>
+            ${canDeliver ? `<button class="btn-success" type="button" data-order-action="deliver" data-id="${escapeHtml(row.id)}">Mark Delivered</button>` : ""}
           </div>
         </td>
       </tr>
-    `)
-    .join("");
+    `;
+  }).join("");
+}
+
+function renderLedger() {
+  if (!state.ledger.length) {
+    els.ledgerTableBody.innerHTML = `<tr><td colspan="4"><div class="empty-state">No wallet history yet.</div></td></tr>`;
+    return;
+  }
+
+  els.ledgerTableBody.innerHTML = state.ledger.map((row) => `
+    <tr>
+      <td>${escapeHtml(row.entry_type)}</td>
+      <td>${escapeHtml(formatBCoins(row.amount_bcoins))}</td>
+      <td>${escapeHtml(row.note || "—")}</td>
+      <td>${escapeHtml(formatDate(row.created_at))}</td>
+    </tr>
+  `).join("");
+}
+
+function renderShop() {
+  if (!state.catalog.length) {
+    els.shopGrid.innerHTML = `<div class="empty-state">No cosmetics available.</div>`;
+    return;
+  }
+
+  const ownedIds = new Set(state.owned.map((x) => x.cosmetic_id));
+
+  els.shopGrid.innerHTML = state.catalog.map((item) => {
+    const owned = ownedIds.has(item.id);
+    const active =
+      state.sellerProfile.active_profile_style === item.code ||
+      state.sellerProfile.active_name_style === item.code ||
+      state.sellerProfile.active_card_style === item.code ||
+      state.sellerProfile.active_badge_style === item.code;
+
+    return `
+      <article class="shop-card">
+        <div class="coin-chip">${escapeHtml(formatBCoins(item.price_bcoins))}</div>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p>${escapeHtml(item.description || "Cosmetic item")}</p>
+        <p><strong>Type:</strong> ${escapeHtml(item.cosmetic_type)}</p>
+        <div class="actions-row">
+          ${owned ? `<button class="btn-secondary" type="button" data-shop-action="apply" data-type="${escapeHtml(item.cosmetic_type)}" data-code="${escapeHtml(item.code)}">${active ? "Applied" : "Apply"}</button>` : `<button class="btn-success" type="button" data-shop-action="buy" data-code="${escapeHtml(item.code)}">Buy</button>`}
+        </div>
+      </article>
+    `;
+  }).join("");
 }
 
 async function uploadListingImage(file) {
@@ -511,6 +652,31 @@ async function deleteListing(id) {
   renderListings();
 }
 
+async function markDelivered(orderId) {
+  const { error } = await supabase.rpc("seller_mark_order_delivered", {
+    target_order_id: orderId,
+  });
+
+  if (error) throw error;
+}
+
+async function buyCosmetic(code) {
+  const { error } = await supabase.rpc("purchase_seller_cosmetic", {
+    target_cosmetic_code: code,
+  });
+
+  if (error) throw error;
+}
+
+async function applyCosmetic(type, code) {
+  const { error } = await supabase.rpc("apply_seller_cosmetic", {
+    target_cosmetic_type: type,
+    target_cosmetic_code: code,
+  });
+
+  if (error) throw error;
+}
+
 async function refreshAll() {
   setStatus("Loading seller dashboard...");
   try {
@@ -528,9 +694,21 @@ async function refreshAll() {
     }
 
     state.sellerProfile = freshProfile;
-    await loadSellerListings();
+
+    await Promise.all([
+      loadSellerListings(),
+      loadSellerOrders(),
+      loadLedger(),
+      loadCatalog(),
+      loadOwned(),
+    ]);
+
     renderProfile();
     renderListings();
+    renderOrders();
+    renderLedger();
+    renderShop();
+
     setStatus("Seller dashboard ready.");
   } catch (error) {
     console.error(error);
@@ -544,8 +722,17 @@ function bindEvents() {
     window.location.href = "./auth.html?logged_out=1";
   });
 
+  document.querySelectorAll(".dashboard-tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => setTab(btn.dataset.tab));
+  });
+
   els.refreshProfileBtn?.addEventListener("click", refreshAll);
   els.refreshListingsBtn?.addEventListener("click", refreshAll);
+  els.refreshOrdersBtn?.addEventListener("click", refreshAll);
+  els.refreshLedgerBtn?.addEventListener("click", refreshAll);
+  els.refreshShopBtn?.addEventListener("click", refreshAll);
+  els.refreshOwnedBtn?.addEventListener("click", refreshAll);
+
   els.contactMethod?.addEventListener("change", syncDiscordField);
 
   els.listingGame?.addEventListener("change", () => {
@@ -587,22 +774,53 @@ function bindEvents() {
   els.sellerListingForm?.addEventListener("submit", saveListing);
   els.resetListingBtn?.addEventListener("click", resetForm);
 
-  els.sellerListingsTableBody?.addEventListener("click", (event) => {
+  els.sellerListingsTableBody?.addEventListener("click", async (event) => {
     const btn = event.target.closest("button[data-action][data-id]");
     if (!btn) return;
 
     const action = btn.dataset.action;
-    const id = btn.dataset.id;
-    const row = state.listings.find((item) => String(item.id) === String(id));
-
+    const row = state.listings.find((item) => String(item.id) === String(btn.dataset.id));
     if (!row) return;
 
     if (action === "edit") {
       loadFormFromListing(row);
     } else if (action === "delete") {
-      deleteListing(row.id);
+      await deleteListing(row.id);
     } else if (action === "sold") {
-      markSold(row.id);
+      await markSold(row.id);
+    }
+  });
+
+  els.sellerOrdersTableBody?.addEventListener("click", async (event) => {
+    const btn = event.target.closest("button[data-order-action][data-id]");
+    if (!btn) return;
+
+    try {
+      setStatus("Updating order...");
+      await markDelivered(btn.dataset.id);
+      await refreshAll();
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message || "Failed to update order.", true);
+    }
+  });
+
+  els.shopGrid?.addEventListener("click", async (event) => {
+    const btn = event.target.closest("button[data-shop-action]");
+    if (!btn) return;
+
+    try {
+      if (btn.dataset.shopAction === "buy") {
+        setStatus("Purchasing cosmetic...");
+        await buyCosmetic(btn.dataset.code);
+      } else if (btn.dataset.shopAction === "apply") {
+        setStatus("Applying cosmetic...");
+        await applyCosmetic(btn.dataset.type, btn.dataset.code);
+      }
+      await refreshAll();
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message || "Shop action failed.", true);
     }
   });
 }
@@ -612,6 +830,7 @@ async function init() {
   const session = await requireSeller();
   if (!session) return;
   resetForm();
+  setTab("listings");
   await refreshAll();
 }
 

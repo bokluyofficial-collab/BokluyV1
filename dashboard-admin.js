@@ -12,9 +12,11 @@ const els = {
 
   refreshApplicationsBtn: document.getElementById("refreshApplicationsBtn"),
   refreshProfilesBtn: document.getElementById("refreshProfilesBtn"),
+  refreshOrdersBtn: document.getElementById("refreshOrdersBtn"),
 
   applicationsTableBody: document.getElementById("applicationsTableBody"),
   profilesTableBody: document.getElementById("profilesTableBody"),
+  ordersTableBody: document.getElementById("ordersTableBody"),
 };
 
 function setStatus(message, isError = false) {
@@ -33,15 +35,18 @@ function escapeHtml(value) {
 }
 
 function formatMoney(value) {
-  const n = Number(value || 0);
-  return `$${n.toLocaleString()}`;
+  return `$${Number(value || 0).toLocaleString()}`;
+}
+
+function formatBCoins(value) {
+  return `${Number(value || 0).toLocaleString()} B Coins`;
 }
 
 function badgeClass(status) {
   const s = String(status || "").toLowerCase();
-  if (s === "pending") return "badge pending";
-  if (s === "approved" || s === "active") return "badge approved";
-  if (s === "rejected" || s === "suspended") return "badge rejected";
+  if (s === "pending" || s === "paid" || s === "delivered" || s === "buyer_completed") return "badge pending";
+  if (s === "approved" || s === "active" || s === "admin_completed") return "badge approved";
+  if (s === "rejected" || s === "suspended" || s === "help_requested") return "badge rejected";
   return "badge";
 }
 
@@ -78,8 +83,8 @@ async function requireAdmin() {
     session.user.email ||
     "Admin";
 
-  if (els.userName) els.userName.textContent = displayName;
-  if (els.userAvatar) els.userAvatar.textContent = String(displayName).trim().charAt(0).toUpperCase();
+  els.userName.textContent = displayName;
+  els.userAvatar.textContent = String(displayName).trim().charAt(0).toUpperCase();
 
   const { data: isAdmin, error: adminErr } = await supabase.rpc("is_admin", {
     check_user_id: session.user.id,
@@ -114,7 +119,17 @@ async function loadApplicationRows() {
 async function loadSellerProfiles() {
   const { data, error } = await supabase
     .from("seller_profiles")
-    .select("user_id, store_name, status, wallet_balance, total_sales, total_withdrawn, created_at")
+    .select("user_id, store_name, status, is_verified, bcoin_balance, lifetime_bcoin_earned, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+async function loadOrders() {
+  const { data, error } = await supabase
+    .from("marketplace_orders")
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -126,9 +141,9 @@ function renderApplicationStats(rows) {
   const approved = rows.filter((row) => row.status === "approved").length;
   const rejected = rows.filter((row) => row.status === "rejected").length;
 
-  if (els.pendingCount) els.pendingCount.textContent = String(pending);
-  if (els.approvedCount) els.approvedCount.textContent = String(approved);
-  if (els.rejectedCount) els.rejectedCount.textContent = String(rejected);
+  els.pendingCount.textContent = String(pending);
+  els.approvedCount.textContent = String(approved);
+  els.rejectedCount.textContent = String(rejected);
 }
 
 function applicationContact(row) {
@@ -139,102 +154,123 @@ function applicationContact(row) {
 }
 
 function renderApplications(rows) {
-  if (!els.applicationsTableBody) return;
-
   const pendingRows = rows.filter((row) => row.status === "pending");
 
   if (!pendingRows.length) {
     els.applicationsTableBody.innerHTML = `
-      <tr>
-        <td colspan="6">
-          <div class="empty-state">No pending seller applications.</div>
-        </td>
-      </tr>
+      <tr><td colspan="6"><div class="empty-state">No pending seller applications.</div></td></tr>
     `;
     return;
   }
 
-  els.applicationsTableBody.innerHTML = pendingRows
-    .map((row) => {
-      const games = Array.isArray(row.games) && row.games.length ? row.games.join(", ") : "—";
+  els.applicationsTableBody.innerHTML = pendingRows.map((row) => {
+    const games = Array.isArray(row.games) && row.games.length ? row.games.join(", ") : "—";
 
-      return `
-        <tr>
-          <td>
-            <strong>${escapeHtml(row.store_name || row.display_name || "Unnamed")}</strong><br />
-            <span style="color:var(--muted);">${escapeHtml(shorten(row.user_id, 26))}</span>
-            ${row.notes ? `<div style="margin-top:8px;color:var(--muted);">${escapeHtml(row.notes)}</div>` : ""}
-          </td>
-          <td>${escapeHtml(applicationContact(row))}</td>
-          <td>${escapeHtml(games)}</td>
-          <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status)}</span></td>
-          <td>${escapeHtml(formatDate(row.created_at))}</td>
-          <td>
-            <div class="actions-row">
-              <button class="btn-success" type="button" data-action="approve" data-user-id="${escapeHtml(row.user_id)}">
-                Approve
-              </button>
-              <button class="btn-danger" type="button" data-action="reject" data-user-id="${escapeHtml(row.user_id)}">
-                Reject
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    })
-    .join("");
+    return `
+      <tr>
+        <td>
+          <strong>${escapeHtml(row.store_name || row.display_name || "Unnamed")}</strong><br />
+          <span style="color:var(--muted);">${escapeHtml(shorten(row.user_id, 26))}</span>
+          ${row.notes ? `<div style="margin-top:8px;color:var(--muted);">${escapeHtml(row.notes)}</div>` : ""}
+        </td>
+        <td>${escapeHtml(applicationContact(row))}</td>
+        <td>${escapeHtml(games)}</td>
+        <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status)}</span></td>
+        <td>${escapeHtml(formatDate(row.created_at))}</td>
+        <td>
+          <div class="actions-row">
+            <button class="btn-success" type="button" data-action="approve" data-user-id="${escapeHtml(row.user_id)}">Approve</button>
+            <button class="btn-danger" type="button" data-action="reject" data-user-id="${escapeHtml(row.user_id)}">Reject</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 function renderProfiles(rows) {
-  if (!els.profilesTableBody) return;
-
   if (!rows.length) {
     els.profilesTableBody.innerHTML = `
-      <tr>
-        <td colspan="6">
-          <div class="empty-state">No seller profiles found.</div>
-        </td>
-      </tr>
+      <tr><td colspan="6"><div class="empty-state">No seller profiles found.</div></td></tr>
     `;
     return;
   }
 
-  els.profilesTableBody.innerHTML = rows
-    .map((row) => {
-      const isSuspended = row.status === "suspended";
-      return `
-        <tr>
-          <td>${escapeHtml(row.store_name || "Unnamed")}</td>
-          <td>${escapeHtml(shorten(row.user_id, 26))}</td>
-          <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status)}</span></td>
-          <td>${escapeHtml(formatMoney(row.wallet_balance))}</td>
-          <td>${escapeHtml(formatMoney(row.total_sales))}</td>
-          <td>
-            <div class="actions-row">
-              ${
-                isSuspended
-                  ? `<button class="btn-success" type="button" data-action="reactivate" data-user-id="${escapeHtml(row.user_id)}">Reactivate</button>`
-                  : `<button class="btn-danger" type="button" data-action="suspend" data-user-id="${escapeHtml(row.user_id)}">Suspend</button>`
-              }
-            </div>
-          </td>
-        </tr>
-      `;
-    })
-    .join("");
+  els.profilesTableBody.innerHTML = rows.map((row) => {
+    const isSuspended = row.status === "suspended";
+    const isVerified = !!row.is_verified;
+
+    return `
+      <tr>
+        <td>
+          ${escapeHtml(row.store_name || "Unnamed")}
+          ${isVerified ? `<span class="verified-badge">✓</span>` : ""}
+        </td>
+        <td>${escapeHtml(shorten(row.user_id, 26))}</td>
+        <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status)}</span></td>
+        <td>${escapeHtml(formatBCoins(row.bcoin_balance))}</td>
+        <td>${escapeHtml(formatBCoins(row.lifetime_bcoin_earned))}</td>
+        <td>
+          <div class="actions-row">
+            ${
+              isVerified
+                ? `<button class="btn-secondary" type="button" data-action="unverify" data-user-id="${escapeHtml(row.user_id)}">Remove Verify</button>`
+                : `<button class="btn-success" type="button" data-action="verify" data-user-id="${escapeHtml(row.user_id)}">Verify</button>`
+            }
+            ${
+              isSuspended
+                ? `<button class="btn-success" type="button" data-action="reactivate" data-user-id="${escapeHtml(row.user_id)}">Reactivate</button>`
+                : `<button class="btn-danger" type="button" data-action="suspend" data-user-id="${escapeHtml(row.user_id)}">Suspend</button>`
+            }
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderOrders(rows) {
+  if (!rows.length) {
+    els.ordersTableBody.innerHTML = `
+      <tr><td colspan="7"><div class="empty-state">No orders found.</div></td></tr>
+    `;
+    return;
+  }
+
+  els.ordersTableBody.innerHTML = rows.map((row) => {
+    const canFinalize = ["buyer_completed", "delivered"].includes(row.status);
+
+    return `
+      <tr>
+        <td>${escapeHtml(row.listing_snapshot_title || "Order")}</td>
+        <td>${escapeHtml(shorten(row.buyer_user_id, 18))}</td>
+        <td>${escapeHtml(shorten(row.seller_user_id, 18))}</td>
+        <td>${escapeHtml(formatMoney(row.total_price_usd))}</td>
+        <td><span class="${badgeClass(row.status)}">${escapeHtml(row.status)}</span></td>
+        <td>${escapeHtml(formatBCoins(row.reward_bcoins || 0))}</td>
+        <td>
+          <div class="actions-row">
+            ${canFinalize ? `<button class="btn-success" type="button" data-order-action="complete" data-id="${escapeHtml(row.id)}">Admin Complete</button>` : ""}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
 async function refreshAll() {
   setStatus("Loading admin dashboard...");
   try {
-    const [applications, profiles] = await Promise.all([
+    const [applications, profiles, orders] = await Promise.all([
       loadApplicationRows(),
       loadSellerProfiles(),
+      loadOrders(),
     ]);
 
     renderApplicationStats(applications);
     renderApplications(applications);
     renderProfiles(profiles);
+    renderOrders(orders);
     setStatus("Admin dashboard ready.");
   } catch (error) {
     console.error(error);
@@ -242,63 +278,14 @@ async function refreshAll() {
   }
 }
 
-async function approveSeller(userId) {
-  const { error } = await supabase.rpc("approve_seller_application", {
-    target_user_id: userId,
-  });
-
+async function callAdminRpc(name, userId) {
+  const { error } = await supabase.rpc(name, { target_user_id: userId });
   if (error) throw error;
 }
 
-async function rejectSeller(userId) {
-  const { error } = await supabase.rpc("reject_seller_application", {
-    target_user_id: userId,
-  });
-
+async function completeOrder(orderId) {
+  const { error } = await supabase.rpc("admin_complete_order", { target_order_id: orderId });
   if (error) throw error;
-}
-
-async function suspendSeller(userId) {
-  const { error } = await supabase.rpc("suspend_seller", {
-    target_user_id: userId,
-  });
-
-  if (error) throw error;
-}
-
-async function reactivateSeller(userId) {
-  const { error } = await supabase.rpc("reactivate_seller", {
-    target_user_id: userId,
-  });
-
-  if (error) throw error;
-}
-
-async function handleAction(action, userId) {
-  try {
-    if (action === "approve") {
-      setStatus("Approving seller...");
-      await approveSeller(userId);
-      setStatus("Seller approved.");
-    } else if (action === "reject") {
-      setStatus("Rejecting seller...");
-      await rejectSeller(userId);
-      setStatus("Seller rejected.");
-    } else if (action === "suspend") {
-      setStatus("Suspending seller...");
-      await suspendSeller(userId);
-      setStatus("Seller suspended.");
-    } else if (action === "reactivate") {
-      setStatus("Reactivating seller...");
-      await reactivateSeller(userId);
-      setStatus("Seller reactivated.");
-    }
-
-    await refreshAll();
-  } catch (error) {
-    console.error(error);
-    setStatus(error.message || "Admin action failed.", true);
-  }
 }
 
 function bindEvents() {
@@ -309,27 +296,59 @@ function bindEvents() {
 
   els.refreshApplicationsBtn?.addEventListener("click", refreshAll);
   els.refreshProfilesBtn?.addEventListener("click", refreshAll);
+  els.refreshOrdersBtn?.addEventListener("click", refreshAll);
 
-  els.applicationsTableBody?.addEventListener("click", (event) => {
+  els.applicationsTableBody?.addEventListener("click", async (event) => {
     const btn = event.target.closest("button[data-action][data-user-id]");
     if (!btn) return;
 
-    const action = btn.dataset.action;
-    const userId = btn.dataset.userId;
-    if (!action || !userId) return;
-
-    handleAction(action, userId);
+    try {
+      if (btn.dataset.action === "approve") {
+        setStatus("Approving seller...");
+        await callAdminRpc("approve_seller_application", btn.dataset.userId);
+      } else if (btn.dataset.action === "reject") {
+        setStatus("Rejecting seller...");
+        await callAdminRpc("reject_seller_application", btn.dataset.userId);
+      }
+      await refreshAll();
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message || "Admin action failed.", true);
+    }
   });
 
-  els.profilesTableBody?.addEventListener("click", (event) => {
+  els.profilesTableBody?.addEventListener("click", async (event) => {
     const btn = event.target.closest("button[data-action][data-user-id]");
     if (!btn) return;
 
-    const action = btn.dataset.action;
-    const userId = btn.dataset.userId;
-    if (!action || !userId) return;
+    try {
+      const actionMap = {
+        verify: "verify_seller",
+        unverify: "unverify_seller",
+        suspend: "suspend_seller",
+        reactivate: "reactivate_seller",
+      };
+      setStatus("Updating seller...");
+      await callAdminRpc(actionMap[btn.dataset.action], btn.dataset.userId);
+      await refreshAll();
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message || "Admin action failed.", true);
+    }
+  });
 
-    handleAction(action, userId);
+  els.ordersTableBody?.addEventListener("click", async (event) => {
+    const btn = event.target.closest("button[data-order-action][data-id]");
+    if (!btn) return;
+
+    try {
+      setStatus("Completing order...");
+      await completeOrder(btn.dataset.id);
+      await refreshAll();
+    } catch (error) {
+      console.error(error);
+      setStatus(error.message || "Order completion failed.", true);
+    }
   });
 }
 

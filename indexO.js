@@ -178,9 +178,10 @@ function detectStoreCategory(row) {
   return null;
 }
 
-function normalizeItemListing(row, sellerNameMap) {
+function normalizeItemListing(row, sellerInfoMap) {
   const sellerId = row.seller_user_id || row.user_id;
   const category = row.category || "Item";
+  const sellerInfo = sellerInfoMap.get(sellerId) || {};
   const image = category === "Accounts"
     ? (row.image_url || FALLBACK_IMAGE)
     : productImageFor(row.game, row.item);
@@ -200,7 +201,8 @@ function normalizeItemListing(row, sellerNameMap) {
     discord: row.discord || "",
     notes: row.notes || "",
     createdAt: row.created_at,
-    sellerName: sellerNameMap.get(sellerId) || "User",
+    sellerName: sellerInfo.store_name || "User",
+    sellerVerified: !!sellerInfo.is_verified,
     image,
   };
 }
@@ -223,6 +225,7 @@ function normalizeStoreProduct(row) {
     notes: row.description || row.notes || "Available from Bokluy store.",
     createdAt: row.created_at || null,
     sellerName: "Bokluy",
+    sellerVerified: false,
     image: row.img_url || productImageFor(row.game, row.title || row.name) || FALLBACK_IMAGE,
     payLink: row.pay_link || "",
     pagePath: getGamePagePath(row.game),
@@ -425,7 +428,7 @@ function renderListings() {
         </div>
         <p>${item.source === "listing" ? `${item.quantity} unit${item.quantity === 1 ? "" : "s"} available` : "Store product"}</p>
         <div class="market-card__seller">
-          <span>Seller: ${escapeHtml(item.sellerName)}</span>
+          <span>Seller: ${escapeHtml(item.sellerName)} ${item.sellerVerified ? "✔" : ""}</span>
           <span>${item.createdAt ? timeAgo(item.createdAt) : "Store"}</span>
         </div>
         <div class="market-card__actions"></div>
@@ -481,7 +484,7 @@ function openListingModal(item) {
     ].join("");
   } else {
     els.detailGrid.innerHTML = [
-      detailField("Seller", item.sellerName),
+      detailField("Seller", `${item.sellerName}${item.sellerVerified ? " ✔" : ""}`),
       detailField("Category", item.category || "Item"),
       detailField("Quantity", String(item.quantity)),
       detailField("Status", item.status || "active"),
@@ -569,11 +572,14 @@ async function loadItemListings() {
   if (sellerIds.length) {
     const { data: sellerRows, error: sellerError } = await supabase
       .from("seller_profiles_public")
-      .select("user_id, store_name")
+      .select("user_id, store_name, is_verified")
       .in("user_id", [...new Set(sellerIds)]);
 
     if (!sellerError) {
-      sellerMap = new Map((sellerRows || []).map((row) => [row.user_id, row.store_name]));
+      sellerMap = new Map((sellerRows || []).map((row) => [
+        row.user_id,
+        { store_name: row.store_name, is_verified: !!row.is_verified }
+      ]));
     }
   }
 

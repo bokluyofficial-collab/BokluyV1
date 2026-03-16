@@ -20,7 +20,7 @@
 
         <div class="nav-actions">
           <a class="ghost-btn" href="./index.html">Marketplace</a>
-          <a class="ghost-btn" href="./home.html">Home</a>
+          <a class="ghost-btn" href="./messages.html">Messages</a>
           <button class="user-chip" id="userChip" type="button">
             <span class="user-avatar" id="userAvatar">A</span>
             <span class="user-name" id="userName">Admin</span>
@@ -34,8 +34,8 @@
       <div class="container">
         <section class="hero-card">
           <span class="eyebrow">Admin control</span>
-          <h1>Seller applications and marketplace admin</h1>
-          <p>Approve or reject seller requests and monitor current seller status.</p>
+          <h1>Seller applications, verification, and order completion</h1>
+          <p>Approve sellers, manage verification, and finalize B Coin rewards.</p>
         </section>
 
         <div class="status-card" id="statusCard">Loading admin dashboard...</div>
@@ -65,7 +65,7 @@
             <div class="section-head">
               <div>
                 <h2>Seller applications</h2>
-                <p>Review pending, approved, and rejected requests.</p>
+                <p>Pending seller approval queue.</p>
               </div>
               <button class="btn-secondary" id="refreshApplicationsBtn" type="button">Refresh</button>
             </div>
@@ -95,7 +95,7 @@
             <div class="section-head">
               <div>
                 <h2>Seller profiles</h2>
-                <p>Current approved sellers and account status.</p>
+                <p>Verification, suspension, and seller status.</p>
               </div>
               <button class="btn-secondary" id="refreshProfilesBtn" type="button">Refresh</button>
             </div>
@@ -107,14 +107,45 @@
                     <th>Store</th>
                     <th>User ID</th>
                     <th>Status</th>
-                    <th>Wallet</th>
-                    <th>Total sales</th>
+                    <th>B Coin</th>
+                    <th>Earned</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="profilesTableBody">
                   <tr>
                     <td colspan="6">Loading...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="table-card">
+            <div class="section-head">
+              <div>
+                <h2>Orders</h2>
+                <p>Complete buyer-finished orders and reward B Coins.</p>
+              </div>
+              <button class="btn-secondary" id="refreshOrdersBtn" type="button">Refresh</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Buyer</th>
+                    <th>Seller</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Reward</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <tr>
+                    <td colspan="7">Loading...</td>
                   </tr>
                 </tbody>
               </table>
