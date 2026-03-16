@@ -645,37 +645,58 @@ async function messageSeller(item) {
     return;
   }
 
-  if (session.user.id === item.userId) {
+  const buyerId = session.user.id;
+  const sellerId = item.userId;
+
+  if (!sellerId) {
+    setStatus("Seller account not found.", "error");
+    return;
+  }
+
+  if (buyerId === sellerId) {
     setStatus("You are the seller of this listing.", "error");
     return;
   }
 
-  const roomName = [session.user.id, item.userId].sort().join("__");
+  const [userA, userB] = [buyerId, sellerId].sort();
+  const roomName = `dm_${userA}_${userB}`;
 
   const { data: existing, error: fetchError } = await supabase
     .from("chat_rooms")
-    .select("id, name")
-    .eq("name", roomName)
+    .select("id, name, user_a_id, user_b_id")
+    .eq("user_a_id", userA)
+    .eq("user_b_id", userB)
     .maybeSingle();
 
   if (fetchError && fetchError.code !== "PGRST116") {
-    setStatus(fetchError.message, "error");
+    setStatus(fetchError.message || "Failed to open chat.", "error");
     return;
   }
 
-  if (!existing) {
-    const { error: insertError } = await supabase
+  let room = existing;
+
+  if (!room) {
+    const { data: inserted, error: insertError } = await supabase
       .from("chat_rooms")
-      .insert({ name: roomName, created_by: session.user.id });
+      .insert({
+        name: roomName,
+        created_by: buyerId,
+        user_a_id: userA,
+        user_b_id: userB,
+        last_message_at: new Date().toISOString(),
+      })
+      .select("id, name, user_a_id, user_b_id")
+      .single();
 
     if (insertError) {
-      setStatus(insertError.message, "error");
+      setStatus(insertError.message || "Failed to create direct message.", "error");
       return;
     }
+
+    room = inserted;
   }
 
-  setStatus("Chat room prepared. Open your chat flow to continue.");
-  closeListingModal();
+  window.location.href = `./messages.html?room_id=${encodeURIComponent(room.id)}`;
 }
 
 function setAuthUI(session) {

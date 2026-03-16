@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bokluy Messages</title>
+  <link rel="stylesheet" href="./dashboard.css" />
+  <link rel="stylesheet" href="./messages.css" />
+</head>
+<body>
+  <div class="dashboard-shell">
+    <header class="site-header">
+      <div class="container nav-row">
+        <a class="brand" href="./home.html" aria-label="Bokluy home">
+          <img class="brand-logo" src="./images/logo.png" alt="Bokluy" />
+          <span class="brand-text">
+            <strong>Bokluy</strong>
+            <span>Messages</span>
+          </span>
+        </a>
+
+        <div class="nav-actions">
+          <a class="ghost-btn" href="./index.html">Marketplace</a>
+          <a class="ghost-btn" href="./dashboard.html">Dashboard</a>
+          <button class="user-chip" id="userChip" type="button">
+            <span class="user-avatar" id="userAvatar">U</span>
+            <span class="user-name" id="userName">User</span>
+          </button>
+          <button class="ghost-btn" id="logoutBtn" type="button">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-wrap">
+      <div class="container">
+        <section class="hero-card">
+          <span class="eyebrow">Direct messages</span>
+          <h1>Marketplace chat</h1>
+          <p>Talk directly with buyers and sellers about listings.</p>
+        </section>
+
+        <div class="status-card" id="statusCard">Loading messages...</div>
+
+        <section class="messages-layout">
+          <aside class="messages-sidebar card">
+            <div class="section-head">
+              <div>
+                <h2>Conversations</h2>
+                <p>Your current message rooms</p>
+              </div>
+              <button class="btn-secondary" id="refreshRoomsBtn" type="button">Refresh</button>
+            </div>
+
+            <div class="messages-room-list" id="roomsList">
+              <div class="empty-state">Loading...</div>
+            </div>
+          </aside>
+
+          <section class="messages-main card">
+            <div class="messages-main-head">
+              <div>
+                <h2 id="chatTitle">Select a conversation</h2>
+                <p id="chatSubtitle">Choose a room from the left.</p>
+              </div>
+            </div>
+
+            <div class="messages-thread" id="messagesThread">
+              <div class="empty-state">No conversation selected.</div>
+            </div>
+
+            <form class="messages-compose" id="messageForm">
+              <textarea id="messageInput" placeholder="Type your message..." rows="3"></textarea>
+              <div class="messages-compose-actions">
+                <button class="btn" id="sendMessageBtn" type="submit">Send</button>
+              </div>
+            </form>
+          </section>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="./messages.js"></script>
+</body>
+</html>
