@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seller Store • Bokluy</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/logo21.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/logo21.png" />
+  <link rel="shortcut icon" href="./images/logo21.png" type="image/png" />
+  <link rel="stylesheet" href="./seller-store.css" />
+</head>
+<body>
+  <header class="store-topbar">
+    <div class="store-topbar__inner">
+      <div class="store-topbar__left">
+        <button id="backBtn" class="top-btn" type="button">Back</button>
+        <a href="./index.html" class="top-btn top-btn--accent">Marketplace</a>
+      </div>
+      <a href="./index.html" class="store-user-pill">Bokluy</a>
+    </div>
+  </header>
+
+  <main class="store-page">
+    <div class="store-status" id="storeStatus">Loading store...</div>
+
+    <section class="store-cover">
+      <div class="store-cover__gradient"></div>
+    </section>
+
+    <section class="store-profile-card">
+      <div class="store-profile">
+        <div class="store-avatar" id="storeAvatar">S</div>
+        <div class="store-profile__text">
+          <div class="store-name-row">
+            <h1 id="storeName">Seller Store</h1>
+            <span class="verified-badge" id="storeBadge" hidden>Verified</span>
+          </div>
+          <p id="storeHandle">@seller</p>
+        </div>
+      </div>
+
+      <div class="store-stats">
+        <div class="store-stat">
+          <strong id="statTotal">0</strong>
+          <span>Listings</span>
+        </div>
+        <div class="store-stat">
+          <strong id="statActive">0</strong>
+          <span>Active</span>
+        </div>
+        <div class="store-stat">
+          <strong id="statSold">0</strong>
+          <span>Sold</span>
+        </div>
+        <div class="store-stat">
+          <strong id="statGames">0</strong>
+          <span>Games</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="store-toolbar">
+      <div class="store-tabs" id="storeTabs">
+        <button type="button" class="store-tab is-active" data-category="All">All</button>
+        <button type="button" class="store-tab" data-category="Item">Item</button>
+        <button type="button" class="store-tab" data-category="Accounts">Accounts</button>
+        <button type="button" class="store-tab" data-category="Services">Services</button>
+      </div>
+
+      <div class="store-search-wrap">
+        <input id="storeSearch" type="text" placeholder="Search products..." />
+      </div>
+    </section>
+
+    <section class="store-grid" id="storeGrid"></section>
+
+    <footer class="store-footer">
+      <div class="store-footer__socials">
+        <a href="#">f</a>
+        <a href="#">✈</a>
+        <a href="#">♪</a>
+      </div>
+      <p>© 2026 Bokluy. All Rights Reserved.</p>
+      <p class="store-footer__links">
+        <a href="./terms.html">Terms &amp; Conditions</a>
+        <span>|</span>
+        <a href="./refund.html">Refund Policy</a>
+      </p>
+    </footer>
+  </main>
+
+  <script src="./products/blox_fruits.js"></script>
+  <script src="./products/anime_last_stand.js"></script>
+  <script type="module" src="./seller-store.js"></script>
+</body>
+</html>

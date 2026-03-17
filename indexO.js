@@ -387,6 +387,14 @@ function detailField(label, value) {
   return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`;
 }
 
+function openListingHref(item) {
+  if (item.source === "store") {
+    return item.pagePath || item.payLink || "#";
+  }
+
+  return `./market-item.html?id=${encodeURIComponent(item.id)}`;
+}
+
 function renderListings() {
   if (!els.listingsGrid) return;
 
@@ -404,125 +412,62 @@ function renderListings() {
 
   for (const item of items) {
     const sold = item.status === "sold_out";
+    const href = openListingHref(item);
 
-    const card = document.createElement("article");
-    card.className = `market-card${sold ? " is-sold" : ""}`;
+    const card = document.createElement("a");
+    card.className = `market-card market-card--compact${sold ? " is-sold" : ""}`;
+    card.href = href;
+    card.setAttribute("aria-label", `${item.item} by ${item.sellerName}`);
+
+    if (item.source === "store" && item.pagePath) {
+      card.dataset.routeMode = "same-tab";
+    } else if (item.source === "store" && item.payLink) {
+      card.dataset.routeMode = "new-tab";
+    }
 
     card.innerHTML = `
       <div class="market-card__media ${sold ? "is-sold" : ""}">
         <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.item)}" onerror="this.src='./image.png'" />
         ${sold ? `<div class="sold-overlay">SOLD</div>` : ""}
       </div>
-      <div>
-        <div class="market-card__top">
-          <div>
-            <div class="market-card__meta">
-              <span class="market-pill ${item.type === "BUYING" ? "buying" : "selling"}">${escapeHtml(item.type)}</span>
-              <span class="market-pill">${escapeHtml(displayGameName(item.game))}</span>
-              <span class="market-pill">${escapeHtml(item.category || state.activeCategory)}</span>
-              ${sold ? `<span class="market-pill">Sold</span>` : ""}
-            </div>
-            <h3>${escapeHtml(item.item)}</h3>
-          </div>
-          <div class="market-card__price">${formatPrice(item.price)}</div>
+      <div class="market-card__content">
+        <h3 class="market-card__title">${escapeHtml(item.item)}</h3>
+        <div class="market-card__seller-line">
+          <span class="market-card__seller-name">${escapeHtml(item.sellerName)}</span>
+          ${item.sellerVerified ? `<span class="verified-badge" aria-label="Verified seller">✓</span>` : ""}
         </div>
-        <p>${item.source === "listing" ? `${item.quantity} unit${item.quantity === 1 ? "" : "s"} available` : "Store product"}</p>
-        <div class="market-card__seller">
-          <span>Seller: ${escapeHtml(item.sellerName)} ${item.sellerVerified ? "✔" : ""}</span>
-          <span>${item.createdAt ? timeAgo(item.createdAt) : "Store"}</span>
+        <div class="market-card__price-row">
+          <span class="market-card__price">${formatPrice(item.price)}</span>
         </div>
-        <div class="market-card__actions"></div>
       </div>
     `;
 
-    const actions = card.querySelector(".market-card__actions");
-
-    actions.append(
-      createActionButton("View details", "primary-inline", () => openListingModal(item))
-    );
-
-    if (item.source === "store") {
-      actions.append(
-        createActionButton("Open product", "success", () => openStoreProduct(item))
-      );
-    } else if (!sold) {
-      if (!state.currentUserId || state.currentUserId !== item.userId) {
-        actions.append(
-          createActionButton("Message seller", "success", () => messageSeller(item))
-        );
+    card.addEventListener("click", (event) => {
+      if (card.dataset.routeMode === "same-tab") {
+        event.preventDefault();
+        window.location.href = href;
+        return;
       }
-    }
+
+      if (card.dataset.routeMode === "new-tab") {
+        event.preventDefault();
+        window.open(href, "_blank", "noopener");
+      }
+    });
 
     els.listingsGrid.append(card);
   }
 }
 
 function openListingModal(item) {
-  if (!els.listingModal) return;
-
-  const sold = item.status === "sold_out";
-
-  els.detailTitle.textContent = item.item;
-  els.detailImage.src = item.image || FALLBACK_IMAGE;
-  els.detailImage.alt = `${item.item} image`;
-  els.detailImage.style.filter = sold ? "brightness(0.45)" : "";
-
-  els.detailPills.innerHTML = `
-    <span class="market-pill ${item.type === "BUYING" ? "buying" : "selling"}">${escapeHtml(item.type)}</span>
-    <span class="market-pill">${escapeHtml(displayGameName(item.game))}</span>
-    <span class="market-pill">${formatPrice(item.price)}</span>
-    <span class="market-pill">${escapeHtml(item.category || state.activeCategory)}</span>
-    ${sold ? `<span class="market-pill">Sold</span>` : ""}
-  `;
+  if (!item) return;
 
   if (item.source === "store") {
-    els.detailGrid.innerHTML = [
-      detailField("Seller", "Bokluy"),
-      detailField("Category", item.category || state.activeCategory),
-      detailField("Game", displayGameName(item.game)),
-      detailField("Open via", item.pagePath ? item.pagePath.replace("./", "") : "Store page"),
-    ].join("");
-  } else {
-    els.detailGrid.innerHTML = [
-      detailField("Seller", `${item.sellerName}${item.sellerVerified ? " ✔" : ""}`),
-      detailField("Category", item.category || "Item"),
-      detailField("Quantity", String(item.quantity)),
-      detailField("Status", item.status || "active"),
-      detailField(
-        "Contact",
-        item.contactMethod === "discord" ? `Discord: ${item.discord || "—"}` : "In-app chat"
-      ),
-      detailField("Created", new Date(item.createdAt).toLocaleString()),
-    ].join("");
+    openStoreProduct(item);
+    return;
   }
 
-  els.detailNotes.textContent = item.notes || "No additional notes.";
-  els.detailActions.innerHTML = "";
-
-  if (item.source === "store") {
-    els.detailActions.append(
-      createActionButton("Open product page", "success", () => openStoreProduct(item))
-    );
-  } else if (!sold) {
-    if (item.contactMethod === "discord" && item.discord) {
-      els.detailActions.append(
-        createActionButton("Copy Discord", "success", async () => {
-          try {
-            await navigator.clipboard.writeText(item.discord);
-            setStatus("Discord username copied.");
-          } catch {
-            setStatus("Clipboard access failed.", "error");
-          }
-        })
-      );
-    } else {
-      els.detailActions.append(
-        createActionButton("Message seller", "success", () => messageSeller(item))
-      );
-    }
-  }
-
-  els.listingModal.showModal();
+  window.location.href = `./market-item.html?id=${encodeURIComponent(item.id)}`;
 }
 
 function closeListingModal() {

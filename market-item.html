@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketplace Item • Bokluy</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/logo21.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./images/logo21.png" />
+  <link rel="shortcut icon" href="./images/logo21.png" type="image/png" />
+  <link rel="stylesheet" href="./market-item.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="back-btn" id="backBtn" type="button" aria-label="Go back">‹</button>
+        <a class="brand" href="./index.html">
+          <img src="./images/logo.png" alt="Bokluy" />
+          <span>Bokluy</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="page-wrap">
+      <div class="status-banner" id="statusBanner">Loading product...</div>
+
+      <section class="product-hero card">
+        <div class="product-image-wrap">
+          <img id="productImage" src="./image.png" alt="Product image" />
+          <div class="sold-badge" id="soldBadge" hidden>SOLD</div>
+        </div>
+
+        <div class="product-main">
+          <h1 class="product-title" id="productTitle">Product</h1>
+          <div class="product-price-line">
+            <span class="product-price" id="productPrice">$0.00</span>
+            <span class="unit-text">/ unit</span>
+          </div>
+          <div class="stock-line">
+            <span>Stock: <strong id="productStock">1</strong></span>
+          </div>
+
+          <div class="qty-row">
+            <button class="qty-btn" id="qtyMinus" type="button">−</button>
+            <input class="qty-input" id="qtyValue" type="text" value="1" inputmode="numeric" readonly />
+            <button class="qty-btn" id="qtyPlus" type="button">+</button>
+            <div class="qty-total">Total: <strong id="inlineTotal">$0.00</strong></div>
+          </div>
+
+          <div class="note-box" id="noteBox">
+            <div class="note-title">Note</div>
+            <p id="productNote">No additional note.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card seller-card">
+        <div class="seller-banner">
+          <div>
+            <div class="seller-banner-title">Seller</div>
+            <div class="seller-banner-name-row">
+              <span id="sellerName">Seller</span>
+              <span class="verified-badge" id="sellerBadge" hidden>✓</span>
+            </div>
+            <div class="seller-banner-sub" id="sellerSubtitle">Marketplace seller</div>
+          </div>
+          <button class="seller-arrow" id="messageSellerTop" type="button">›</button>
+        </div>
+
+        <div class="seller-actions">
+          <button class="mini-btn" id="messageSellerBtn" type="button">Message seller</button>
+          <button class="mini-btn ghost" id="viewStoreBtn" type="button">View store</button>
+        </div>
+      </section>
+
+      <section class="card payment-card">
+        <h2 class="section-title">Payment method</h2>
+        <label class="payment-option is-active">
+          <input type="radio" name="paymentMethod" value="aba" checked />
+          <img src="./images/aba.png" alt="ABA KHQR" />
+          <div>
+            <strong>ABA KHQR</strong>
+            <span>Scan to pay with any banking app</span>
+          </div>
+        </label>
+      </section>
+
+      <section class="card terms-card">
+        <h2 class="section-title">Terms &amp; Conditions</h2>
+        <label class="terms-check">
+          <input id="termsCheck" type="checkbox" />
+          <span>By clicking Buy Now, you acknowledge that you have read and agree to Bokluy marketplace terms.</span>
+        </label>
+      </section>
+
+      <div class="bottom-spacer"></div>
+    </main>
+
+    <div class="bottom-bar">
+      <div class="bottom-total">
+        <span>Total</span>
+        <strong id="bottomTotal">$0.00</strong>
+      </div>
+      <button class="buy-btn" id="buyNowBtn" type="button">Buy Now</button>
+    </div>
+  </div>
+
+  <script src="./products/blox_fruits.js"></script>
+  <script src="./products/anime_last_stand.js"></script>
+  <script type="module" src="./market-item.js"></script>
+</body>
+</html>
