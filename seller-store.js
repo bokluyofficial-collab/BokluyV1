@@ -7,6 +7,30 @@ const PRODUCT_CATALOG = [
 
 const FALLBACK_IMAGE = "./image.png";
 
+const NAME_STYLES = {
+  name_gold: { color: "#d4a514" },
+  name_purple: { color: "#7c3aed" },
+  name_cyan: { color: "#06b6d4" },
+};
+
+const BANNER_STYLES = {
+  banner_red_wave: "banner-red-wave",
+  banner_blue_ice: "banner-blue-ice",
+  banner_dark_gold: "banner-dark-gold",
+};
+
+const AVATAR_BORDERS = {
+  border_gold_ring: "avatar-border-gold-ring",
+  border_fire_glow: "avatar-border-fire-glow",
+  border_neon_blue: "avatar-border-neon-blue",
+};
+
+const STORE_THEMES = {
+  theme_clean_light: "theme-clean-light",
+  theme_red_pro: "theme-red-pro",
+  theme_dark_gold: "theme-dark-gold",
+};
+
 const state = {
   sellerId: null,
   seller: null,
@@ -18,7 +42,10 @@ const state = {
 const els = {
   backBtn: document.getElementById("backBtn"),
   storeStatus: document.getElementById("storeStatus"),
+  storeCover: document.getElementById("storeCover"),
   storeAvatar: document.getElementById("storeAvatar"),
+  storeAvatarImg: document.getElementById("storeAvatarImg"),
+  storeAvatarFallback: document.getElementById("storeAvatarFallback"),
   storeName: document.getElementById("storeName"),
   storeBadge: document.getElementById("storeBadge"),
   storeHandle: document.getElementById("storeHandle"),
@@ -37,6 +64,7 @@ function setStatus(message, isError = false) {
     els.storeStatus.textContent = "";
     return;
   }
+
   els.storeStatus.textContent = message;
   els.storeStatus.className = `store-status is-visible${isError ? " is-error" : ""}`;
 }
@@ -63,6 +91,7 @@ function productImageFor(game, item) {
       String(entry.P_name || "").toLowerCase() === String(item || "").toLowerCase()
     );
   });
+
   return match?.image || FALLBACK_IMAGE;
 }
 
@@ -71,13 +100,81 @@ function getSellerIdFromQuery() {
   return url.searchParams.get("seller");
 }
 
+function resetCosmeticClasses() {
+  document.body.classList.remove(
+    "theme-clean-light",
+    "theme-red-pro",
+    "theme-dark-gold"
+  );
+
+  els.storeCover.classList.remove(
+    "banner-red-wave",
+    "banner-blue-ice",
+    "banner-dark-gold"
+  );
+
+  els.storeAvatar.classList.remove(
+    "avatar-border-gold-ring",
+    "avatar-border-fire-glow",
+    "avatar-border-neon-blue"
+  );
+
+  els.storeName.style.color = "";
+}
+
+function applySellerCosmetics(profile) {
+  resetCosmeticClasses();
+
+  if (profile.active_store_theme && STORE_THEMES[profile.active_store_theme]) {
+    document.body.classList.add(STORE_THEMES[profile.active_store_theme]);
+  } else {
+    document.body.classList.add("theme-clean-light");
+  }
+
+  if (profile.active_banner_style && BANNER_STYLES[profile.active_banner_style]) {
+    els.storeCover.classList.add(BANNER_STYLES[profile.active_banner_style]);
+  }
+
+  if (profile.active_avatar_border && AVATAR_BORDERS[profile.active_avatar_border]) {
+    els.storeAvatar.classList.add(AVATAR_BORDERS[profile.active_avatar_border]);
+  }
+
+  if (profile.active_name_style && NAME_STYLES[profile.active_name_style]) {
+    els.storeName.style.color = NAME_STYLES[profile.active_name_style].color;
+  }
+}
+
+function renderAvatar(profile) {
+  const avatarUrl = profile.avatar_url || "";
+  const fallback = String(profile.store_name || "S").trim().charAt(0).toUpperCase();
+
+  if (avatarUrl) {
+    els.storeAvatarImg.src = avatarUrl;
+    els.storeAvatarImg.hidden = false;
+    els.storeAvatarFallback.hidden = true;
+  } else {
+    els.storeAvatarImg.hidden = true;
+    els.storeAvatarFallback.hidden = false;
+    els.storeAvatarFallback.textContent = fallback;
+  }
+}
+
 async function loadSeller() {
   state.sellerId = getSellerIdFromQuery();
   if (!state.sellerId) throw new Error("Missing seller id.");
 
   const { data, error } = await supabase
     .from("seller_profiles_public")
-    .select("user_id, store_name, is_verified")
+    .select(`
+      user_id,
+      store_name,
+      is_verified,
+      avatar_url,
+      active_name_style,
+      active_banner_style,
+      active_avatar_border,
+      active_store_theme
+    `)
     .eq("user_id", state.sellerId)
     .maybeSingle();
 
@@ -128,7 +225,9 @@ function renderStoreHeader() {
   els.storeName.textContent = seller.store_name || "Seller Store";
   els.storeHandle.textContent = `@${String(seller.store_name || "seller").toLowerCase().replace(/\s+/g, "")}`;
   els.storeBadge.hidden = !seller.is_verified;
-  els.storeAvatar.textContent = String(seller.store_name || "S").trim().charAt(0).toUpperCase();
+
+  renderAvatar(seller);
+  applySellerCosmetics(seller);
 
   els.statTotal.textContent = String(listings.length);
   els.statActive.textContent = String(activeCount);

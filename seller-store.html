@@ -9,7 +9,7 @@
   <link rel="shortcut icon" href="./images/logo21.png" type="image/png" />
   <link rel="stylesheet" href="./seller-store.css" />
 </head>
-<body>
+<body class="theme-clean-light">
   <header class="store-topbar">
     <div class="store-topbar__inner">
       <div class="store-topbar__left">
@@ -23,13 +23,17 @@
   <main class="store-page">
     <div class="store-status" id="storeStatus">Loading store...</div>
 
-    <section class="store-cover">
+    <section class="store-cover" id="storeCover">
       <div class="store-cover__gradient"></div>
     </section>
 
     <section class="store-profile-card">
       <div class="store-profile">
-        <div class="store-avatar" id="storeAvatar">S</div>
+        <div class="store-avatar" id="storeAvatar">
+          <img id="storeAvatarImg" src="./image.png" alt="Seller avatar" hidden />
+          <span id="storeAvatarFallback">S</span>
+        </div>
+
         <div class="store-profile__text">
           <div class="store-name-row">
             <h1 id="storeName">Seller Store</h1>
@@ -80,7 +84,7 @@
         <a href="#">✈</a>
         <a href="#">♪</a>
       </div>
-      <p>© 2026 Bokluy. All Rights Reserved.</p>
+      <p>© 2025 Bokluy. All Rights Reserved.</p>
       <p class="store-footer__links">
         <a href="./terms.html">Terms &amp; Conditions</a>
         <span>|</span>
