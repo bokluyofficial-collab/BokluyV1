@@ -17,12 +17,35 @@ const els = {
   applicationsTableBody: document.getElementById("applicationsTableBody"),
   profilesTableBody: document.getElementById("profilesTableBody"),
   ordersTableBody: document.getElementById("ordersTableBody"),
+
+  grantForm: document.getElementById("grantForm"),
+  grantUserIdInput: document.getElementById("grantUserIdInput"),
+  grantAmountInput: document.getElementById("grantAmountInput"),
+  grantReasonInput: document.getElementById("grantReasonInput"),
+  grantFormStatus: document.getElementById("grantFormStatus"),
+  adminStoreBtn: document.getElementById("adminStoreBtn"),
+
+  adminTabs: document.querySelectorAll(".admin-main-tab-btn"),
+  adminMainPanel: document.getElementById("adminMainPanel"),
+  storeMainPanel: document.getElementById("storeMainPanel"),
+  adminStoreFrame: document.getElementById("adminStoreFrame"),
+  adminStoreRefreshBtn: document.getElementById("adminStoreRefreshBtn"),
+  adminStoreOpenTabBtn: document.getElementById("adminStoreOpenTabBtn"),
+};
+
+const state = {
+  session: null,
 };
 
 function setStatus(message, isError = false) {
   if (!els.statusCard) return;
   els.statusCard.textContent = message;
   els.statusCard.className = `status-card${isError ? " is-error" : ""}`;
+}
+
+function setGrantStatus(message, isError = false) {
+  els.grantFormStatus.textContent = message || "";
+  els.grantFormStatus.style.color = isError ? "#fecaca" : "var(--muted)";
 }
 
 function escapeHtml(value) {
@@ -61,6 +84,15 @@ function shorten(value, max = 18) {
   const text = String(value || "");
   if (text.length <= max) return text;
   return `${text.slice(0, max)}...`;
+}
+
+function setAdminMainTab(tab) {
+  els.adminTabs.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.adminTab === tab);
+  });
+
+  els.adminMainPanel.hidden = tab !== "admin";
+  els.storeMainPanel.hidden = tab !== "store";
 }
 
 async function requireAdmin() {
@@ -103,6 +135,7 @@ async function requireAdmin() {
     return null;
   }
 
+  state.session = session;
   return session;
 }
 
@@ -288,6 +321,62 @@ async function completeOrder(orderId) {
   if (error) throw error;
 }
 
+async function submitGrant(event) {
+  event.preventDefault();
+
+  const targetUserId = els.grantUserIdInput.value.trim();
+  const amount = Number(els.grantAmountInput.value);
+  const reason = els.grantReasonInput.value.trim();
+
+  if (!targetUserId) {
+    setGrantStatus("Enter a target user ID.", true);
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount === 0) {
+    setGrantStatus("Enter a valid B Coin amount.", true);
+    return;
+  }
+
+  setGrantStatus("Applying B Coin adjustment...");
+
+  const { error } = await supabase.rpc("grant_bcoins", {
+    target_user_id: targetUserId,
+    amount_bcoins: amount,
+    reason,
+  });
+
+  if (error) {
+    console.error(error);
+    setGrantStatus(error.message || "Failed to grant B Coins.", true);
+    return;
+  }
+
+  setGrantStatus("B Coin adjustment completed.");
+  await refreshAll();
+}
+
+async function openOrCreateAdminStore() {
+  setStatus("Preparing your store...");
+
+  const storeName = window.prompt("Store name for your admin shop:", "Admin Store") || "Admin Store";
+
+  const { error } = await supabase.rpc("ensure_admin_seller_profile", {
+    target_store_name: storeName,
+  });
+
+  if (error) {
+    console.error(error);
+    setStatus(error.message || "Failed to prepare admin store.", true);
+    return;
+  }
+
+  setAdminMainTab("store");
+  if (els.adminStoreFrame) {
+    els.adminStoreFrame.src = "./dashboard-seller.html?tab=dashboard&mode=admin_store";
+  }
+}
+
 function bindEvents() {
   els.logoutBtn?.addEventListener("click", async () => {
     await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
@@ -297,6 +386,24 @@ function bindEvents() {
   els.refreshApplicationsBtn?.addEventListener("click", refreshAll);
   els.refreshProfilesBtn?.addEventListener("click", refreshAll);
   els.refreshOrdersBtn?.addEventListener("click", refreshAll);
+  els.grantForm?.addEventListener("submit", submitGrant);
+  els.adminStoreBtn?.addEventListener("click", openOrCreateAdminStore);
+
+  els.adminTabs.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setAdminMainTab(btn.dataset.adminTab);
+    });
+  });
+
+  els.adminStoreRefreshBtn?.addEventListener("click", () => {
+    if (els.adminStoreFrame) {
+      els.adminStoreFrame.src = "./dashboard-seller.html?tab=dashboard&mode=admin_store&ts=" + Date.now();
+    }
+  });
+
+  els.adminStoreOpenTabBtn?.addEventListener("click", () => {
+    window.open("./dashboard-seller.html?tab=dashboard&mode=admin_store", "_blank");
+  });
 
   els.applicationsTableBody?.addEventListener("click", async (event) => {
     const btn = event.target.closest("button[data-action][data-user-id]");
@@ -356,6 +463,7 @@ async function init() {
   bindEvents();
   const session = await requireAdmin();
   if (!session) return;
+  setAdminMainTab("admin");
   await refreshAll();
 }
 

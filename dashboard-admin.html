@@ -5,6 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bokluy Admin Dashboard</title>
   <link rel="stylesheet" href="./dashboard.css" />
+  <style>
+    .admin-main-tabs {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0 18px;
+      flex-wrap: wrap;
+    }
+
+    .admin-main-tab-btn {
+      min-height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--line, #2a2a2a);
+      background: rgba(255,255,255,0.04);
+      color: inherit;
+      padding: 0 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .admin-main-tab-btn.is-active {
+      background: linear-gradient(180deg, #ef4444, #dc2626);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .admin-main-panel[hidden] {
+      display: none !important;
+    }
+
+    .store-dashboard-shell {
+      width: 100%;
+      min-height: 1200px;
+      border: 1px solid var(--line, #2a2a2a);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .store-dashboard-frame {
+      width: 100%;
+      min-height: 1200px;
+      border: 0;
+      background: transparent;
+    }
+  </style>
 </head>
 <body>
   <div class="dashboard-shell">
@@ -34,121 +79,190 @@
       <div class="container">
         <section class="hero-card">
           <span class="eyebrow">Admin control</span>
-          <h1>Seller applications, verification, and order completion</h1>
-          <p>Approve sellers, manage verification, and finalize B Coin rewards.</p>
+          <h1>Admin tools and store management</h1>
+          <p>Manage sellers, orders, B Coins, and your own admin shop.</p>
         </section>
 
         <div class="status-card" id="statusCard">Loading admin dashboard...</div>
 
-        <section class="grid-3">
-          <article class="stat-card">
-            <div class="label">Pending applications</div>
-            <div class="value" id="pendingCount">0</div>
-            <div class="hint">Waiting for review</div>
-          </article>
+        <div class="admin-main-tabs">
+          <button class="admin-main-tab-btn is-active" type="button" data-admin-tab="admin">
+            Admin Panel
+          </button>
+          <button class="admin-main-tab-btn" type="button" data-admin-tab="store">
+            Admin Store Dashboard
+          </button>
+        </div>
 
-          <article class="stat-card">
-            <div class="label">Approved sellers</div>
-            <div class="value" id="approvedCount">0</div>
-            <div class="hint">Active seller profiles</div>
-          </article>
+        <div class="admin-main-panel" id="adminMainPanel">
+          <section class="grid-3">
+            <article class="stat-card">
+              <div class="label">Pending applications</div>
+              <div class="value" id="pendingCount">0</div>
+              <div class="hint">Waiting for review</div>
+            </article>
 
-          <article class="stat-card">
-            <div class="label">Rejected applications</div>
-            <div class="value" id="rejectedCount">0</div>
-            <div class="hint">Applications not approved</div>
-          </article>
-        </section>
+            <article class="stat-card">
+              <div class="label">Approved sellers</div>
+              <div class="value" id="approvedCount">0</div>
+              <div class="hint">Active seller profiles</div>
+            </article>
 
-        <div class="sections">
-          <section class="table-card">
-            <div class="section-head">
-              <div>
-                <h2>Seller applications</h2>
-                <p>Pending seller approval queue.</p>
-              </div>
-              <button class="btn-secondary" id="refreshApplicationsBtn" type="button">Refresh</button>
-            </div>
-
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Store</th>
-                    <th>Contact</th>
-                    <th>Games</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="applicationsTableBody">
-                  <tr>
-                    <td colspan="6">Loading...</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <article class="stat-card">
+              <div class="label">Rejected applications</div>
+              <div class="value" id="rejectedCount">0</div>
+              <div class="hint">Applications not approved</div>
+            </article>
           </section>
 
-          <section class="table-card">
+          <div class="sections">
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <h2>Grant B Coins</h2>
+                  <p>Admins can add or remove B Coins from any user at any time.</p>
+                </div>
+                <button class="btn-secondary" id="adminStoreBtn" type="button">Create / Open My Store</button>
+              </div>
+
+              <form id="grantForm">
+                <div class="form-grid">
+                  <label class="field">
+                    <span>Target user ID</span>
+                    <input id="grantUserIdInput" type="text" placeholder="Paste user UUID" required />
+                  </label>
+
+                  <label class="field">
+                    <span>Amount</span>
+                    <input id="grantAmountInput" type="number" placeholder="100" required />
+                  </label>
+
+                  <label class="field field-wide">
+                    <span>Reason</span>
+                    <input id="grantReasonInput" type="text" placeholder="Bonus, event reward, manual adjustment..." />
+                  </label>
+                </div>
+
+                <div class="actions-row" style="margin-top:14px;">
+                  <button class="btn-success" id="grantBcoinsBtn" type="submit">Grant / Adjust B Coins</button>
+                </div>
+                <div style="margin-top:10px;color:var(--muted);" id="grantFormStatus"></div>
+              </form>
+            </section>
+
+            <section class="table-card">
+              <div class="section-head">
+                <div>
+                  <h2>Seller applications</h2>
+                  <p>Pending seller approval queue.</p>
+                </div>
+                <button class="btn-secondary" id="refreshApplicationsBtn" type="button">Refresh</button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Store</th>
+                      <th>Contact</th>
+                      <th>Games</th>
+                      <th>Status</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="applicationsTableBody">
+                    <tr>
+                      <td colspan="6">Loading...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="table-card">
+              <div class="section-head">
+                <div>
+                  <h2>Seller profiles</h2>
+                  <p>Verification, suspension, seller status, and balances.</p>
+                </div>
+                <button class="btn-secondary" id="refreshProfilesBtn" type="button">Refresh</button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Store</th>
+                      <th>User ID</th>
+                      <th>Status</th>
+                      <th>B Coin</th>
+                      <th>Earned</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="profilesTableBody">
+                    <tr>
+                      <td colspan="6">Loading...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="table-card">
+              <div class="section-head">
+                <div>
+                  <h2>Orders</h2>
+                  <p>Complete buyer-finished orders and reward B Coins.</p>
+                </div>
+                <button class="btn-secondary" id="refreshOrdersBtn" type="button">Refresh</button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Item</th>
+                      <th>Buyer</th>
+                      <th>Seller</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Reward</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ordersTableBody">
+                    <tr>
+                      <td colspan="7">Loading...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="admin-main-panel" id="storeMainPanel" hidden>
+          <section class="card">
             <div class="section-head">
               <div>
-                <h2>Seller profiles</h2>
-                <p>Verification, suspension, and seller status.</p>
+                <h2>Admin Store Dashboard</h2>
+                <p>This is your seller dashboard embedded inside the admin page.</p>
               </div>
-              <button class="btn-secondary" id="refreshProfilesBtn" type="button">Refresh</button>
-            </div>
-
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Store</th>
-                    <th>User ID</th>
-                    <th>Status</th>
-                    <th>B Coin</th>
-                    <th>Earned</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="profilesTableBody">
-                  <tr>
-                    <td colspan="6">Loading...</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section class="table-card">
-            <div class="section-head">
-              <div>
-                <h2>Orders</h2>
-                <p>Complete buyer-finished orders and reward B Coins.</p>
+              <div class="actions-row">
+                <button class="btn-secondary" id="adminStoreRefreshBtn" type="button">Refresh Store Dashboard</button>
+                <button class="btn-secondary" id="adminStoreOpenTabBtn" type="button">Open in New Tab</button>
               </div>
-              <button class="btn-secondary" id="refreshOrdersBtn" type="button">Refresh</button>
             </div>
 
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Buyer</th>
-                    <th>Seller</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Reward</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="ordersTableBody">
-                  <tr>
-                    <td colspan="7">Loading...</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="store-dashboard-shell">
+              <iframe
+                id="adminStoreFrame"
+                class="store-dashboard-frame"
+                src="./dashboard-seller.html?tab=dashboard&mode=admin_store"
+                title="Admin Store Dashboard"
+              ></iframe>
             </div>
           </section>
         </div>

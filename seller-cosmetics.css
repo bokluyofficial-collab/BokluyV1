@@ -1,0 +1,190 @@
+/* =========================
+   STATIC NAME STYLES
+========================= */
+
+.name-style-gold {
+  color: #d4a514 !important;
+}
+
+.name-style-red {
+  color: #ef4444 !important;
+}
+
+.name-style-blue {
+  color: #3b82f6 !important;
+}
+
+.name-style-green {
+  color: #22c55e !important;
+}
+
+.name-style-purple {
+  color: #a855f7 !important;
+}
+
+.name-style-pink {
+  color: #ec4899 !important;
+}
+
+.name-style-orange {
+  color: #f97316 !important;
+}
+
+.name-style-cyan {
+  color: #06b6d4 !important;
+}
+
+.name-style-white {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255,255,255,0.25);
+}
+
+.name-style-black {
+  color: #111111 !important;
+}
+
+/* =========================
+   ANIMATED NAME STYLES
+========================= */
+
+.name-style-fire-blaze {
+  background: linear-gradient(90deg, #ff6a00, #ff2200, #ffd000, #ff6a00);
+  background-size: 200% auto;
+  animation: fireBlazeMove 3s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 14px rgba(255, 98, 0, 0.28);
+}
+
+@keyframes fireBlazeMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.name-style-electric-neon {
+  background: linear-gradient(90deg, #00c3ff, #7c3aed, #38bdf8, #00c3ff);
+  background-size: 220% auto;
+  animation: electricNeonMove 3.2s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 12px rgba(0, 195, 255, 0.35);
+}
+
+@keyframes electricNeonMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 220% center; }
+}
+
+.name-style-candy-pop {
+  background: linear-gradient(90deg, #ff5ea8, #ff87d8, #ff5ea8);
+  background-size: 180% auto;
+  animation: candyPopMove 2.8s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(255, 94, 168, 0.3);
+}
+
+@keyframes candyPopMove {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.name-style-golden-spark {
+  background: linear-gradient(90deg, #f5c542, #fff1a8, #d4a514, #f5c542);
+  background-size: 220% auto;
+  animation: goldenSparkMove 3.5s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 12px rgba(245, 197, 66, 0.35);
+}
+
+@keyframes goldenSparkMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 220% center; }
+}
+
+.name-style-rainbow-splash {
+  background: linear-gradient(90deg, #ff4d4d, #ffb84d, #ffe14d, #4dff88, #4dd2ff, #9a4dff, #ff4db8);
+  background-size: 240% auto;
+  animation: rainbowSplashMove 4s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes rainbowSplashMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 240% center; }
+}
+
+.name-style-galaxy-wave {
+  background: linear-gradient(90deg, #5b21b6, #7c3aed, #2563eb, #06b6d4, #5b21b6);
+  background-size: 220% auto;
+  animation: galaxyWaveMove 4.2s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 14px rgba(124, 58, 237, 0.3);
+}
+
+@keyframes galaxyWaveMove {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.name-style-lightning-strike {
+  background: linear-gradient(90deg, #ffffff, #60a5fa, #ffffff, #1d4ed8, #ffffff);
+  background-size: 220% auto;
+  animation: lightningStrikeMove 1.8s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 14px rgba(96, 165, 250, 0.45);
+}
+
+@keyframes lightningStrikeMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 220% center; }
+}
+
+.name-style-flower-bloom {
+  background: linear-gradient(90deg, #ff7ac6, #d946ef, #a855f7, #ff7ac6);
+  background-size: 200% auto;
+  animation: flowerBloomMove 3.8s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(217, 70, 239, 0.25);
+}
+
+@keyframes flowerBloomMove {
+  0% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+  100% { background-position: 0% center; }
+}
+
+.name-style-retro-sunset {
+  background: linear-gradient(90deg, #ff4d6d, #ff9f1c, #ffd60a, #6c63ff, #ff4d6d);
+  background-size: 220% auto;
+  animation: retroSunsetMove 4s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 12px rgba(255, 77, 109, 0.25);
+}
+
+@keyframes retroSunsetMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 220% center; }
+}
+
+.name-style-dark-metal {
+  background: linear-gradient(90deg, #d1d5db, #6b7280, #f3f4f6, #374151, #d1d5db);
+  background-size: 220% auto;
+  animation: darkMetalMove 3.5s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 10px rgba(107, 114, 128, 0.3);
+}
+
+@keyframes darkMetalMove {
+  0% { background-position: 0% center; }
+  100% { background-position: 220% center; }
+}

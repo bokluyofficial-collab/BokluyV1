@@ -8,9 +8,27 @@ const PRODUCT_CATALOG = [
 const FALLBACK_IMAGE = "./image.png";
 
 const NAME_STYLES = {
-  name_gold: { color: "#d4a514" },
-  name_purple: { color: "#7c3aed" },
-  name_cyan: { color: "#06b6d4" },
+  name_gold: { className: "name-style-gold" },
+  name_red: { className: "name-style-red" },
+  name_blue: { className: "name-style-blue" },
+  name_green: { className: "name-style-green" },
+  name_purple: { className: "name-style-purple" },
+  name_pink: { className: "name-style-pink" },
+  name_orange: { className: "name-style-orange" },
+  name_cyan: { className: "name-style-cyan" },
+  name_white: { className: "name-style-white" },
+  name_black: { className: "name-style-black" },
+
+  name_fire_blaze: { className: "name-style-fire-blaze" },
+  name_electric_neon: { className: "name-style-electric-neon" },
+  name_candy_pop: { className: "name-style-candy-pop" },
+  name_golden_spark: { className: "name-style-golden-spark" },
+  name_rainbow_splash: { className: "name-style-rainbow-splash" },
+  name_galaxy_wave: { className: "name-style-galaxy-wave" },
+  name_lightning_strike: { className: "name-style-lightning-strike" },
+  name_flower_bloom: { className: "name-style-flower-bloom" },
+  name_retro_sunset: { className: "name-style-retro-sunset" },
+  name_dark_metal: { className: "name-style-dark-metal" },
 };
 
 const BANNER_STYLES = {
@@ -37,6 +55,9 @@ const state = {
   listings: [],
   filtered: [],
   activeCategory: "All",
+  currentUserId: null,
+  isAdmin: false,
+  canManageStore: false,
 };
 
 const els = {
@@ -56,6 +77,10 @@ const els = {
   storeTabs: document.getElementById("storeTabs"),
   storeSearch: document.getElementById("storeSearch"),
   storeGrid: document.getElementById("storeGrid"),
+  ownerPanel: document.getElementById("ownerPanel"),
+  ownerDashboardBtn: document.getElementById("ownerDashboardBtn"),
+  ownerCreateListingBtn: document.getElementById("ownerCreateListingBtn"),
+  ownerShopBtn: document.getElementById("ownerShopBtn"),
 };
 
 function setStatus(message, isError = false) {
@@ -64,7 +89,6 @@ function setStatus(message, isError = false) {
     els.storeStatus.textContent = "";
     return;
   }
-
   els.storeStatus.textContent = message;
   els.storeStatus.className = `store-status is-visible${isError ? " is-error" : ""}`;
 }
@@ -91,7 +115,6 @@ function productImageFor(game, item) {
       String(entry.P_name || "").toLowerCase() === String(item || "").toLowerCase()
     );
   });
-
   return match?.image || FALLBACK_IMAGE;
 }
 
@@ -107,19 +130,24 @@ function resetCosmeticClasses() {
     "theme-dark-gold"
   );
 
-  els.storeCover.classList.remove(
+  els.storeCover?.classList.remove(
     "banner-red-wave",
     "banner-blue-ice",
     "banner-dark-gold"
   );
 
-  els.storeAvatar.classList.remove(
+  els.storeAvatar?.classList.remove(
     "avatar-border-gold-ring",
     "avatar-border-fire-glow",
     "avatar-border-neon-blue"
   );
 
+  if (els.storeName) {
   els.storeName.style.color = "";
+  Object.values(NAME_STYLES).forEach((entry) => {
+    if (entry.className) els.storeName.classList.remove(entry.className);
+  });
+}
 }
 
 function applySellerCosmetics(profile) {
@@ -132,16 +160,19 @@ function applySellerCosmetics(profile) {
   }
 
   if (profile.active_banner_style && BANNER_STYLES[profile.active_banner_style]) {
-    els.storeCover.classList.add(BANNER_STYLES[profile.active_banner_style]);
+    els.storeCover?.classList.add(BANNER_STYLES[profile.active_banner_style]);
   }
 
   if (profile.active_avatar_border && AVATAR_BORDERS[profile.active_avatar_border]) {
-    els.storeAvatar.classList.add(AVATAR_BORDERS[profile.active_avatar_border]);
+    els.storeAvatar?.classList.add(AVATAR_BORDERS[profile.active_avatar_border]);
   }
 
-  if (profile.active_name_style && NAME_STYLES[profile.active_name_style]) {
-    els.storeName.style.color = NAME_STYLES[profile.active_name_style].color;
+ if (profile.active_name_style && NAME_STYLES[profile.active_name_style] && els.storeName) {
+  const styleDef = NAME_STYLES[profile.active_name_style];
+  if (styleDef.className) {
+    els.storeName.classList.add(styleDef.className);
   }
+}
 }
 
 function renderAvatar(profile) {
@@ -157,6 +188,29 @@ function renderAvatar(profile) {
     els.storeAvatarFallback.hidden = false;
     els.storeAvatarFallback.textContent = fallback;
   }
+}
+
+async function detectViewerAccess() {
+  const { data } = await supabase.auth.getSession();
+  const session = data?.session || null;
+
+  state.currentUserId = session?.user?.id || null;
+  state.isAdmin = false;
+  state.canManageStore = false;
+
+  if (!state.currentUserId) return;
+
+  if (state.currentUserId === state.sellerId) {
+    state.canManageStore = true;
+    return;
+  }
+
+  const { data: isAdmin } = await supabase.rpc("is_admin", {
+    check_user_id: state.currentUserId,
+  });
+
+  state.isAdmin = isAdmin === true;
+  state.canManageStore = state.isAdmin;
 }
 
 async function loadSeller() {
@@ -235,6 +289,11 @@ function renderStoreHeader() {
   els.statGames.textContent = String(gamesCount);
 }
 
+function renderOwnerPanel() {
+  if (els.ownerPanel) els.ownerPanel.hidden = !state.canManageStore;
+  if (els.ownerDashboardBtn) els.ownerDashboardBtn.hidden = !state.canManageStore;
+}
+
 function applyFilters() {
   const query = els.storeSearch.value.trim().toLowerCase();
 
@@ -287,7 +346,7 @@ function renderGrid() {
 }
 
 function bindEvents() {
-  els.backBtn.addEventListener("click", () => {
+  els.backBtn?.addEventListener("click", () => {
     if (window.history.length > 1) {
       window.history.back();
       return;
@@ -295,7 +354,7 @@ function bindEvents() {
     window.location.href = "./index.html";
   });
 
-  els.storeTabs.addEventListener("click", (event) => {
+  els.storeTabs?.addEventListener("click", (event) => {
     const btn = event.target.closest(".store-tab");
     if (!btn) return;
 
@@ -308,14 +367,28 @@ function bindEvents() {
     applyFilters();
   });
 
-  els.storeSearch.addEventListener("input", applyFilters);
+  els.storeSearch?.addEventListener("input", applyFilters);
+
+  els.ownerDashboardBtn?.addEventListener("click", () => {
+    window.location.href = "./dashboard-seller.html?tab=dashboard";
+  });
+
+  els.ownerCreateListingBtn?.addEventListener("click", () => {
+    window.location.href = "./dashboard-seller.html?tab=dashboard&focus=create";
+  });
+
+  els.ownerShopBtn?.addEventListener("click", () => {
+    window.location.href = "./dashboard-seller.html?tab=customize";
+  });
 }
 
 async function init() {
   bindEvents();
   await loadSeller();
+  await detectViewerAccess();
   await loadListings();
   renderStoreHeader();
+  renderOwnerPanel();
   applyFilters();
   setStatus("");
 }

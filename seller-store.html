@@ -7,6 +7,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="./images/logo21.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="./images/logo21.png" />
   <link rel="shortcut icon" href="./images/logo21.png" type="image/png" />
+  <link rel="stylesheet" href="./seller-cosmetics.css" />
   <link rel="stylesheet" href="./seller-store.css" />
 </head>
 <body class="theme-clean-light">
@@ -39,7 +40,11 @@
             <h1 id="storeName">Seller Store</h1>
             <span class="verified-badge" id="storeBadge" hidden>Verified</span>
           </div>
-          <p id="storeHandle">@seller</p>
+
+          <div class="store-handle-row">
+            <p id="storeHandle">@seller</p>
+            <button id="ownerDashboardBtn" class="store-inline-btn" type="button" hidden>Dashboard</button>
+          </div>
         </div>
       </div>
 
@@ -60,6 +65,20 @@
           <strong id="statGames">0</strong>
           <span>Games</span>
         </div>
+      </div>
+    </section>
+
+    <section class="owner-panel" id="ownerPanel" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Manage this store</h2>
+          <p>Quick actions for your shop.</p>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn-secondary" id="ownerCreateListingBtn" type="button">Create Listing</button>
+        <button class="btn-secondary" id="ownerShopBtn" type="button">Customize Store</button>
       </div>
     </section>
 

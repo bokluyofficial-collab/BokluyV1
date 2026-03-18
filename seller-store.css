@@ -574,3 +574,53 @@ body.theme-dark-gold .store-footer {
     min-height: 22px;
   }
 }
+.owner-panel {
+  margin-top: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+.store-handle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.store-inline-btn {
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #f5f5f5;
+  color: #444;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.owner-panel {
+  margin-top: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-secondary {
+  min-height: 38px;
+  border-radius: 12px;
+  border: 1px solid #dddddd;
+  background: #f5f5f5;
+  color: #555;
+  padding: 0 14px;
+  font-weight: 700;
+}

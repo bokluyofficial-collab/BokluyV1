@@ -258,6 +258,11 @@ async function getSellerApplication(userId) {
   return data || null;
 }
 
+function getMyStoreHref() {
+  if (!state.currentUserId) return "./auth.html";
+  return `./seller-store.html?seller=${encodeURIComponent(state.currentUserId)}`;
+}
+
 function syncCategoryButtons() {
   const buttons = document.querySelectorAll(".category-btn");
   buttons.forEach((btn) => {
@@ -266,7 +271,7 @@ function syncCategoryButtons() {
 
   if (els.openComposerBtn) {
     els.openComposerBtn.hidden = !state.canManage;
-    els.openComposerBtn.textContent = "Create Listing";
+    els.openComposerBtn.textContent = "My Store";
   }
 }
 
@@ -481,7 +486,7 @@ function openSellerDashboard() {
   }
 
   if (state.sellerProfile) {
-    window.location.href = "./dashboard-seller.html";
+    window.location.href = getMyStoreHref();
     return;
   }
 
@@ -681,13 +686,13 @@ function setAuthUI(session) {
 
   if (els.openComposerBtn) {
     els.openComposerBtn.hidden = !state.canManage;
-    els.openComposerBtn.textContent = "Create Listing";
+    els.openComposerBtn.textContent = "My Store";
   }
 
   if (state.sellerProfile) {
     if (els.sellOpenBtn) {
       els.sellOpenBtn.hidden = false;
-      els.sellOpenBtn.textContent = "Create Listing";
+      els.sellOpenBtn.textContent = "My Store";
     }
     if (els.becomeSellerBtn) els.becomeSellerBtn.hidden = true;
   } else if (state.sellerApplication?.status === "pending") {

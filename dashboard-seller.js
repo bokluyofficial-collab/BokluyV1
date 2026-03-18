@@ -41,6 +41,13 @@ const LISTING_OPTIONS = {
   }
 };
 
+const COSMETIC_LABELS = {
+  name_style: "Name color",
+  banner: "Banner",
+  avatar_border: "Avatar border",
+  theme: "Theme",
+};
+
 const state = {
   session: null,
   sellerProfile: null,
@@ -69,13 +76,24 @@ const els = {
   refreshLedgerBtn: document.getElementById("refreshLedgerBtn"),
   refreshShopBtn: document.getElementById("refreshShopBtn"),
   refreshOwnedBtn: document.getElementById("refreshOwnedBtn"),
+  refreshCustomizeBtn: document.getElementById("refreshCustomizeBtn"),
+  openStoreBtn: document.getElementById("openStoreBtn"),
 
   sellerProfileInfo: document.getElementById("sellerProfileInfo"),
   sellerListingsTableBody: document.getElementById("sellerListingsTableBody"),
   sellerOrdersTableBody: document.getElementById("sellerOrdersTableBody"),
   ledgerTableBody: document.getElementById("ledgerTableBody"),
   shopGrid: document.getElementById("shopGrid"),
+  ownedGrid: document.getElementById("ownedGrid"),
+  inventoryTableBody: document.getElementById("inventoryTableBody"),
   activeCosmeticsInfo: document.getElementById("activeCosmeticsInfo"),
+
+  avatarForm: document.getElementById("avatarForm"),
+  avatarUrlInput: document.getElementById("avatarUrlInput"),
+  avatarPreviewImg: document.getElementById("avatarPreviewImg"),
+  avatarPreviewFallback: document.getElementById("avatarPreviewFallback"),
+  avatarFormStatus: document.getElementById("avatarFormStatus"),
+  resetAvatarBtn: document.getElementById("resetAvatarBtn"),
 
   sellerListingForm: document.getElementById("sellerListingForm"),
   listingGame: document.getElementById("listingGame"),
@@ -140,6 +158,11 @@ function setFormStatus(message, isError = false) {
   els.listingFormStatus.style.color = isError ? "#fecaca" : "var(--muted)";
 }
 
+function setAvatarStatus(message, isError = false) {
+  els.avatarFormStatus.textContent = message || "";
+  els.avatarFormStatus.style.color = isError ? "#fecaca" : "var(--muted)";
+}
+
 function syncDiscordField() {
   els.discordField.hidden = els.contactMethod.value !== "discord";
 }
@@ -193,6 +216,41 @@ function populateItems() {
   `;
 }
 
+function renderAvatarPreview(url, name) {
+  const fallback = String(name || "S").trim().charAt(0).toUpperCase();
+  if (url) {
+    els.avatarPreviewImg.src = url;
+    els.avatarPreviewImg.hidden = false;
+    els.avatarPreviewFallback.hidden = true;
+  } else {
+    els.avatarPreviewImg.hidden = true;
+    els.avatarPreviewFallback.hidden = false;
+    els.avatarPreviewFallback.textContent = fallback;
+  }
+}
+
+function getAvatarCooldownText(value) {
+  if (!value) return "You can update your avatar now.";
+  const next = new Date(new Date(value).getTime() + 3 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  if (next <= now) return "You can update your avatar now.";
+
+  const diff = next.getTime() - now.getTime();
+  const totalHours = Math.ceil(diff / (1000 * 60 * 60));
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
+
+  if (days > 0) return `You can update your avatar again in ${days} day(s) ${hours} hour(s).`;
+  return `You can update your avatar again in ${hours} hour(s).`;
+}
+
+function resetAvatarForm() {
+  const sp = state.sellerProfile || {};
+  els.avatarUrlInput.value = sp.avatar_url || "";
+  renderAvatarPreview(sp.avatar_url || "", sp.store_name || "Seller");
+  setAvatarStatus(getAvatarCooldownText(sp.avatar_updated_at), false);
+}
+
 function resetForm() {
   state.editingId = null;
   state.editingImageUrl = null;
@@ -212,13 +270,20 @@ function resetForm() {
 }
 
 function setTab(tab) {
+  const safeTab = ["dashboard", "customize", "inventory"].includes(tab) ? tab : "dashboard";
+
   document.querySelectorAll(".dashboard-tab-btn").forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.tab === tab);
+    btn.classList.toggle("is-active", btn.dataset.tab === safeTab);
   });
 
-  document.getElementById("tab-listings").hidden = tab !== "listings";
-  document.getElementById("tab-orders").hidden = tab !== "orders";
-  document.getElementById("tab-shop").hidden = tab !== "shop";
+  document.getElementById("tab-dashboard").hidden = safeTab !== "dashboard";
+  document.getElementById("tab-customize").hidden = safeTab !== "customize";
+  document.getElementById("tab-inventory").hidden = safeTab !== "inventory";
+}
+
+function getInitialTabFromQuery() {
+  const url = new URL(window.location.href);
+  return url.searchParams.get("tab") || "dashboard";
 }
 
 async function requireSeller() {
@@ -234,6 +299,10 @@ async function requireSeller() {
     window.location.href = "./auth.html";
     return null;
   }
+
+  const url = new URL(window.location.href);
+  const mode = url.searchParams.get("mode");
+  const allowAdminStore = mode === "admin_store";
 
   const displayName =
     session.user.user_metadata?.display_name ||
@@ -253,11 +322,6 @@ async function requireSeller() {
     return null;
   }
 
-  if (isAdmin === true) {
-    window.location.href = "./dashboard-admin.html";
-    return null;
-  }
-
   const { data: sellerProfile, error: sellerErr } = await supabase
     .from("seller_profiles")
     .select("*")
@@ -270,7 +334,17 @@ async function requireSeller() {
     return null;
   }
 
+  if (isAdmin === true && !allowAdminStore) {
+    window.location.href = "./dashboard-admin.html";
+    return null;
+  }
+
   if (!sellerProfile) {
+    if (isAdmin === true && allowAdminStore) {
+      setStatus("Admin store profile not found.", true);
+      return null;
+    }
+
     window.location.href = "./dashboard-user.html";
     return null;
   }
@@ -279,7 +353,6 @@ async function requireSeller() {
   state.sellerProfile = sellerProfile;
   return session;
 }
-
 async function loadSellerListings() {
   const { data, error } = await supabase
     .from("listings")
@@ -359,29 +432,35 @@ function renderProfile() {
       <span class="v">${escapeHtml(formatBCoins(sp.lifetime_bcoin_earned))}</span>
     </div>
     <div class="info-item">
-      <span class="k">Active name style</span>
+      <span class="k">Avatar cooldown</span>
+      <span class="v">${escapeHtml(getAvatarCooldownText(sp.avatar_updated_at))}</span>
+    </div>
+    <div class="info-item">
+      <span class="k">Active name color</span>
       <span class="v">${escapeHtml(sp.active_name_style || "Default")}</span>
     </div>
     <div class="info-item">
-      <span class="k">Active profile style</span>
-      <span class="v">${escapeHtml(sp.active_profile_style || "Default")}</span>
+      <span class="k">Active banner</span>
+      <span class="v">${escapeHtml(sp.active_banner_style || "Default")}</span>
     </div>
     <div class="info-item">
-      <span class="k">Active card style</span>
-      <span class="v">${escapeHtml(sp.active_card_style || "Default")}</span>
+      <span class="k">Active avatar border</span>
+      <span class="v">${escapeHtml(sp.active_avatar_border || "Default")}</span>
     </div>
     <div class="info-item">
-      <span class="k">Active badge style</span>
-      <span class="v">${escapeHtml(sp.active_badge_style || "Default")}</span>
+      <span class="k">Active theme</span>
+      <span class="v">${escapeHtml(sp.active_store_theme || "Default")}</span>
     </div>
   `;
 
   els.activeCosmeticsInfo.innerHTML = `
-    <div class="info-item"><span class="k">Profile style</span><span class="v">${escapeHtml(sp.active_profile_style || "Default")}</span></div>
-    <div class="info-item"><span class="k">Name style</span><span class="v">${escapeHtml(sp.active_name_style || "Default")}</span></div>
-    <div class="info-item"><span class="k">Card style</span><span class="v">${escapeHtml(sp.active_card_style || "Default")}</span></div>
-    <div class="info-item"><span class="k">Badge style</span><span class="v">${escapeHtml(sp.active_badge_style || "Default")}</span></div>
+    <div class="info-item"><span class="k">Name color</span><span class="v">${escapeHtml(sp.active_name_style || "Default")}</span></div>
+    <div class="info-item"><span class="k">Banner</span><span class="v">${escapeHtml(sp.active_banner_style || "Default")}</span></div>
+    <div class="info-item"><span class="k">Avatar border</span><span class="v">${escapeHtml(sp.active_avatar_border || "Default")}</span></div>
+    <div class="info-item"><span class="k">Theme</span><span class="v">${escapeHtml(sp.active_store_theme || "Default")}</span></div>
   `;
+
+  resetAvatarForm();
 }
 
 function renderListings() {
@@ -454,6 +533,15 @@ function renderLedger() {
   `).join("");
 }
 
+function isActiveCosmetic(item) {
+  const sp = state.sellerProfile;
+  if (item.cosmetic_type === "name_style") return sp.active_name_style === item.code;
+  if (item.cosmetic_type === "banner") return sp.active_banner_style === item.code;
+  if (item.cosmetic_type === "avatar_border") return sp.active_avatar_border === item.code;
+  if (item.cosmetic_type === "theme") return sp.active_store_theme === item.code;
+  return false;
+}
+
 function renderShop() {
   if (!state.catalog.length) {
     els.shopGrid.innerHTML = `<div class="empty-state">No cosmetics available.</div>`;
@@ -464,22 +552,74 @@ function renderShop() {
 
   els.shopGrid.innerHTML = state.catalog.map((item) => {
     const owned = ownedIds.has(item.id);
-    const active =
-      state.sellerProfile.active_profile_style === item.code ||
-      state.sellerProfile.active_name_style === item.code ||
-      state.sellerProfile.active_card_style === item.code ||
-      state.sellerProfile.active_badge_style === item.code;
+    const active = isActiveCosmetic(item);
+    const label = COSMETIC_LABELS[item.cosmetic_type] || item.cosmetic_type;
 
     return `
       <article class="shop-card">
         <div class="coin-chip">${escapeHtml(formatBCoins(item.price_bcoins))}</div>
         <h3>${escapeHtml(item.title)}</h3>
         <p>${escapeHtml(item.description || "Cosmetic item")}</p>
-        <p><strong>Type:</strong> ${escapeHtml(item.cosmetic_type)}</p>
+        <p><strong>Type:</strong> ${escapeHtml(label)}</p>
         <div class="actions-row">
-          ${owned ? `<button class="btn-secondary" type="button" data-shop-action="apply" data-type="${escapeHtml(item.cosmetic_type)}" data-code="${escapeHtml(item.code)}">${active ? "Applied" : "Apply"}</button>` : `<button class="btn-success" type="button" data-shop-action="buy" data-code="${escapeHtml(item.code)}">Buy</button>`}
+          ${
+            owned
+              ? `<button class="btn-secondary" type="button" data-shop-action="apply" data-type="${escapeHtml(item.cosmetic_type)}" data-code="${escapeHtml(item.code)}" ${active ? "disabled" : ""}>${active ? "Applied" : "Apply"}</button>`
+              : `<button class="btn-success" type="button" data-shop-action="buy" data-code="${escapeHtml(item.code)}">Buy</button>`
+          }
         </div>
       </article>
+    `;
+  }).join("");
+}
+
+function renderOwnedGrid() {
+  const ownedIds = new Set(state.owned.map((x) => x.cosmetic_id));
+  const ownedCatalog = state.catalog.filter((item) => ownedIds.has(item.id));
+
+  if (!ownedCatalog.length) {
+    els.ownedGrid.innerHTML = `<div class="empty-state">You do not own any cosmetics yet.</div>`;
+    return;
+  }
+
+  els.ownedGrid.innerHTML = ownedCatalog.map((item) => {
+    const active = isActiveCosmetic(item);
+    const label = COSMETIC_LABELS[item.cosmetic_type] || item.cosmetic_type;
+
+    return `
+      <article class="shop-card">
+        <div class="coin-chip">${escapeHtml(label)}</div>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p>${escapeHtml(item.description || "Owned cosmetic")}</p>
+        <div class="actions-row">
+          <button class="btn-secondary" type="button" data-shop-action="apply" data-type="${escapeHtml(item.cosmetic_type)}" data-code="${escapeHtml(item.code)}" ${active ? "disabled" : ""}>
+            ${active ? "Applied" : "Apply"}
+          </button>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderInventoryTable() {
+  const ownedMap = new Map(state.owned.map((row) => [row.cosmetic_id, row]));
+  const ownedCatalog = state.catalog.filter((item) => ownedMap.has(item.id));
+
+  if (!ownedCatalog.length) {
+    els.inventoryTableBody.innerHTML = `<tr><td colspan="3"><div class="empty-state">No purchased cosmetics yet.</div></td></tr>`;
+    return;
+  }
+
+  els.inventoryTableBody.innerHTML = ownedCatalog.map((item) => {
+    const ownedRow = ownedMap.get(item.id);
+    const label = COSMETIC_LABELS[item.cosmetic_type] || item.cosmetic_type;
+
+    return `
+      <tr>
+        <td>${escapeHtml(item.title)}</td>
+        <td>${escapeHtml(label)}</td>
+        <td>${escapeHtml(formatDate(ownedRow?.purchased_at))}</td>
+      </tr>
     `;
   }).join("");
 }
@@ -662,7 +802,7 @@ async function markDelivered(orderId) {
 
 async function buyCosmetic(code) {
   const { error } = await supabase.rpc("purchase_seller_cosmetic", {
-    target_cosmetic_code: code,
+    target_code: code,
   });
 
   if (error) throw error;
@@ -670,11 +810,35 @@ async function buyCosmetic(code) {
 
 async function applyCosmetic(type, code) {
   const { error } = await supabase.rpc("apply_seller_cosmetic", {
-    target_cosmetic_type: type,
-    target_cosmetic_code: code,
+    target_type: type,
+    target_code: code,
   });
 
   if (error) throw error;
+}
+
+async function saveAvatar(event) {
+  event.preventDefault();
+  const newUrl = els.avatarUrlInput.value.trim();
+
+  if (!newUrl) {
+    setAvatarStatus("Enter an avatar image URL first.", true);
+    return;
+  }
+
+  setAvatarStatus("Updating avatar...");
+
+  const { error } = await supabase.rpc("update_seller_avatar", {
+    new_avatar_url: newUrl,
+  });
+
+  if (error) {
+    setAvatarStatus(error.message || "Failed to update avatar.", true);
+    return;
+  }
+
+  setAvatarStatus("Avatar updated.");
+  await refreshAll();
 }
 
 async function refreshAll() {
@@ -708,6 +872,8 @@ async function refreshAll() {
     renderOrders();
     renderLedger();
     renderShop();
+    renderOwnedGrid();
+    renderInventoryTable();
 
     setStatus("Seller dashboard ready.");
   } catch (error) {
@@ -732,8 +898,19 @@ function bindEvents() {
   els.refreshLedgerBtn?.addEventListener("click", refreshAll);
   els.refreshShopBtn?.addEventListener("click", refreshAll);
   els.refreshOwnedBtn?.addEventListener("click", refreshAll);
+  els.refreshCustomizeBtn?.addEventListener("click", refreshAll);
+  els.openStoreBtn?.addEventListener("click", () => {
+    window.location.href = `./seller-store.html?seller=${encodeURIComponent(state.session.user.id)}`;
+  });
 
   els.contactMethod?.addEventListener("change", syncDiscordField);
+
+  els.avatarUrlInput?.addEventListener("input", () => {
+    renderAvatarPreview(els.avatarUrlInput.value.trim(), state.sellerProfile?.store_name || "Seller");
+  });
+
+  els.avatarForm?.addEventListener("submit", saveAvatar);
+  els.resetAvatarBtn?.addEventListener("click", resetAvatarForm);
 
   els.listingGame?.addEventListener("change", () => {
     populateCategories();
@@ -784,6 +961,7 @@ function bindEvents() {
 
     if (action === "edit") {
       loadFormFromListing(row);
+      setTab("dashboard");
     } else if (action === "delete") {
       await deleteListing(row.id);
     } else if (action === "sold") {
@@ -805,7 +983,7 @@ function bindEvents() {
     }
   });
 
-  els.shopGrid?.addEventListener("click", async (event) => {
+  const handleShopClick = async (event) => {
     const btn = event.target.closest("button[data-shop-action]");
     if (!btn) return;
 
@@ -822,7 +1000,10 @@ function bindEvents() {
       console.error(error);
       setStatus(error.message || "Shop action failed.", true);
     }
-  });
+  };
+
+  els.shopGrid?.addEventListener("click", handleShopClick);
+  els.ownedGrid?.addEventListener("click", handleShopClick);
 }
 
 async function init() {
@@ -830,7 +1011,7 @@ async function init() {
   const session = await requireSeller();
   if (!session) return;
   resetForm();
-  setTab("listings");
+  setTab(getInitialTabFromQuery());
   await refreshAll();
 }
 

@@ -34,8 +34,8 @@
       <div class="container">
         <section class="hero-card">
           <span class="eyebrow">Seller center</span>
-          <h1>Manage listings, orders, wallet, and customization</h1>
-          <p>Earn B Coins from completed orders and spend them on seller cosmetics.</p>
+          <h1>Manage listings, store customization, and inventory</h1>
+          <p>Use your store as the main hub, then manage products and cosmetics here.</p>
         </section>
 
         <div class="status-card" id="statusCard">Loading seller dashboard...</div>
@@ -61,21 +61,25 @@
         </section>
 
         <div class="dashboard-tabs">
-          <button class="dashboard-tab-btn is-active" type="button" data-tab="listings">Listings</button>
-          <button class="dashboard-tab-btn" type="button" data-tab="orders">Orders & Wallet</button>
-          <button class="dashboard-tab-btn" type="button" data-tab="shop">Customization Shop</button>
+          <button class="dashboard-tab-btn is-active" type="button" data-tab="dashboard">Dashboard</button>
+          <button class="dashboard-tab-btn" type="button" data-tab="customize">Customize Store</button>
+          <button class="dashboard-tab-btn" type="button" data-tab="inventory">Inventory</button>
         </div>
 
-        <div class="dashboard-tab-panel" id="tab-listings">
+        <div class="dashboard-tab-panel" id="tab-dashboard">
           <div class="sections">
             <section class="card">
               <div class="section-head">
                 <div>
                   <h2>Seller profile</h2>
-                  <p>Your seller account details and active cosmetic selections.</p>
+                  <p>Your seller account details and quick info.</p>
                 </div>
-                <button class="btn-secondary" id="refreshProfileBtn" type="button">Refresh</button>
+                <div class="actions-row">
+                  <button class="btn-secondary" id="refreshProfileBtn" type="button">Refresh</button>
+                  <button class="btn-secondary" id="openStoreBtn" type="button">Open My Store</button>
+                </div>
               </div>
+
               <div class="info-list" id="sellerProfileInfo">
                 <div class="info-item">
                   <span class="k">Status</span>
@@ -209,11 +213,7 @@
                 </table>
               </div>
             </section>
-          </div>
-        </div>
 
-        <div class="dashboard-tab-panel" id="tab-orders" hidden>
-          <div class="sections">
             <section class="table-card">
               <div class="section-head">
                 <div>
@@ -274,15 +274,15 @@
           </div>
         </div>
 
-        <div class="dashboard-tab-panel" id="tab-shop" hidden>
+        <div class="dashboard-tab-panel" id="tab-customize" hidden>
           <div class="sections">
             <section class="card">
               <div class="section-head">
                 <div>
-                  <h2>Owned & active cosmetics</h2>
-                  <p>Apply your purchased seller customizations.</p>
+                  <h2>Edit store</h2>
+                  <p>Choose owned cosmetics and update your store appearance.</p>
                 </div>
-                <button class="btn-secondary" id="refreshOwnedBtn" type="button">Refresh</button>
+                <button class="btn-secondary" id="refreshCustomizeBtn" type="button">Refresh</button>
               </div>
 
               <div class="info-list" id="activeCosmeticsInfo">
@@ -296,14 +296,90 @@
             <section class="card">
               <div class="section-head">
                 <div>
+                  <h2>Avatar</h2>
+                  <p>You can change your avatar once every 3 days.</p>
+                </div>
+              </div>
+
+              <form id="avatarForm">
+                <div class="form-grid">
+                  <div class="field">
+                    <span>Current avatar</span>
+                    <div id="avatarPreviewBox" style="width:96px;height:96px;border-radius:999px;overflow:hidden;border:1px solid var(--line);display:grid;place-items:center;background:rgba(255,255,255,0.04);font-weight:800;">
+                      <img id="avatarPreviewImg" alt="Seller avatar" hidden style="width:100%;height:100%;object-fit:cover;" />
+                      <span id="avatarPreviewFallback">S</span>
+                    </div>
+                  </div>
+
+                  <label class="field field-wide">
+                    <span>Avatar image URL</span>
+                    <input id="avatarUrlInput" type="text" placeholder="https://example.com/avatar.png" />
+                  </label>
+                </div>
+
+                <div class="actions-row" style="margin-top:14px;">
+                  <button class="btn" type="submit" id="saveAvatarBtn">Update avatar</button>
+                  <button class="btn-secondary" type="button" id="resetAvatarBtn">Reset</button>
+                </div>
+                <div style="margin-top:10px;color:var(--muted);" id="avatarFormStatus"></div>
+              </form>
+            </section>
+
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <h2>Apply owned cosmetics</h2>
+                  <p>Only items you own can be applied to your store.</p>
+                </div>
+                <button class="btn-secondary" id="refreshOwnedBtn" type="button">Refresh</button>
+              </div>
+
+              <div class="shop-grid" id="ownedGrid">
+                <div class="empty-state">Loading...</div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="dashboard-tab-panel" id="tab-inventory" hidden>
+          <div class="sections">
+            <section class="card">
+              <div class="section-head">
+                <div>
                   <h2>Customization shop</h2>
-                  <p>Spend B Coins on seller profile cosmetics.</p>
+                  <p>Buy more cosmetics with B Coins.</p>
                 </div>
                 <button class="btn-secondary" id="refreshShopBtn" type="button">Refresh</button>
               </div>
 
               <div class="shop-grid" id="shopGrid">
                 <div class="empty-state">Loading...</div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="section-head">
+                <div>
+                  <h2>Owned inventory</h2>
+                  <p>Everything you’ve bought for your store.</p>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Type</th>
+                      <th>Purchased</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventoryTableBody">
+                    <tr>
+                      <td colspan="3">Loading...</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </section>
           </div>
